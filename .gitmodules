@@ -1,0 +1,3 @@
+[submodule "vendor/stremio-addon-manager"]
+	path = vendor/stremio-addon-manager
+	url = https://github.com/pancake3000/stremio-addon-manager
