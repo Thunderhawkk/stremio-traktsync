@@ -4,6 +4,7 @@ build/
 *.min.js.map
 
 # Environment and secrets
+.env
 .env.*.local
 
 # Logs and caches

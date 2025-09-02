@@ -29,10 +29,7 @@ const app = express();
 
 app.use('/api', listsRouter);
 app.use('/api/stremio', stremioRoutes);
-app.use(
-  '/reorder',
-  express.static(path.join(__dirname, '..', 'vendor', 'stremio-addon-manager', 'dist'))
-);
+app.use('/reorder', express.static(path.join(__dirname, '..', 'vendor', 'stremio-addon-manager', 'dist')));
 
 // Security + perf
 app.set('etag', 'strong');
@@ -116,9 +113,7 @@ app.use(limiterApp);
 // Default landing
 app.get('/', (_req, res) => res.redirect('/login'));
 
-app.get('/reorder/*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'vendor', 'stremio-addon-manager', 'dist', 'index.html'));
-});
+app.get('/reorder/*', (req,res) => res.sendFile(path.join(__dirname, '..', 'vendor', 'stremio-addon-manager', 'dist', 'index.html')));
 
 // IMPORTANT: server-rendered pages AFTER SPA mounts so /dashboard stays SPA.
 // This ensures /login and /register are handled by legacy templates (not SPA), fixing blank pages.

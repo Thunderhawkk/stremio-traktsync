@@ -29,12 +29,12 @@
   ],
   "addonToken": "f4579323d3bfb0823fdd438780a2ce70",
   "traktTokens": {
-    "access_token": "6a19a68850f0017a1535c168cf75c795927364382646f3c4c18f5f156ab60d51",
-    "refresh_token": "2467bd69c66db588b5b349386eeb4952f55f87bfe7bcc494d5a1e95a7778833d",
-    "expires_at": "1970-01-22T07:59:40.763Z"
+    "access_token": "654fa360b414f9e86cf0e9a934a2553296e6c71079327518e56f2da8136845f8",
+    "refresh_token": "575e45fa592f8caa1b7bfdb5c5089ab41f713b9a7fec952b7f4d78b0a9c596fb",
+    "expires_at": "1970-01-22T08:00:10.881Z"
   },
   "manifestVersion": 1,
-  "lastAutoRefreshAt": "2025-09-02T02:55:16.771Z",
+  "lastAutoRefreshAt": "2025-09-02T11:17:15.562Z",
   "lastManualRefreshAt": null,
   "addonName": "Trakt",
   "catalogPrefix": ""
