@@ -1,0 +1,291 @@
+/* =========================
+   TraktSync Auth Theme v2 — Matte Slate (no glows)
+   ========================= */
+
+/* Design tokens */
+:root{
+  --bg:#0b0f17;                /* page background */
+  --panel:#0e1524;             /* card background (matte) */
+  --panel-2:#0c1322;           /* deeper panel shade */
+  --text:#e5e7eb;              /* primary text */
+  --muted:#9fb0c7;             /* secondary text */
+  --line:#1e293b;              /* separators / outlines */
+  --border:rgba(255,255,255,.12);
+  --accent:#6aa5ff;            /* brand accent */
+  --accent-600:#5b8ef0;
+  --ring:0 0 0 3px rgba(106,165,255,.24);
+  --radius:14px;
+  --field-h:48px;
+  --shadow-lg:0 20px 50px rgba(0,0,0,.55);
+}
+
+/* Base */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;color:var(--text);
+  font:14px/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;
+  background:var(--bg);
+  background-image:none; /* no glows */
+}
+
+/* Header */
+.header{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-bottom:1px solid var(--line);
+  background:rgba(11,15,23,.70);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  position:sticky;top:0;z-index:40
+}
+.brand{display:flex;align-items:center;gap:10px;color:#cbd5e1}
+.brand-badge{height:28px;width:28px;border-radius:8px;background:linear-gradient(135deg,#90a7ff,#6aa5ff);box-shadow:var(--shadow-lg)}
+.site{letter-spacing:.20em;text-transform:uppercase;font-size:11px;color:#cbd5e1}
+.spacer{flex:1}
+.theme-toggle{padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--text)}
+
+/* Layout */
+.container{max-width:720px;margin:10vh auto;padding:0 16px}
+
+/* Card — matte, crisp, no glow */
+.card,.auth-card{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:24px;
+  box-shadow:var(--shadow-lg);
+  overflow:hidden;
+}
+
+/* Text */
+h1{margin:0 0 10px 0;font-size:26px;letter-spacing:.2px}
+.small{color:var(--muted)}
+
+/* Labels */
+label{display:block;margin:14px 0 8px;color:#cbd5e1}
+
+/* Fields — unified */
+.auth-card input[type="text"], .auth-card input[type="email"], .auth-card input[type="password"],
+.auth-card select, .auth-card textarea,
+.card input[type="text"], .card input[type="email"], .card input[type="password"],
+.card select, .card textarea{
+  display:block;width:100%;max-width:100%;
+  height:var(--field-h);
+  padding:0 14px;border-radius:12px;
+  color:var(--text);
+  background:#0f182a;                  /* matte field */
+  border:1px solid var(--line);
+  outline:none;
+  transition:border-color .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35);
+}
+.auth-card textarea,.card textarea{min-height:110px;padding:12px 14px;resize:vertical}
+.auth-card input::placeholder,.card input::placeholder,
+.auth-card textarea::placeholder,.card textarea::placeholder{color:#8ba0bd}
+.auth-card input:hover,.card input:hover,
+.auth-card select:hover,.card select:hover,
+.auth-card textarea:hover,.card textarea:hover{
+  background:#112039;
+}
+.auth-card input:focus,.card input:focus,
+.auth-card select:focus,.card select:focus,
+.auth-card textarea:focus,.card textarea:focus{
+  border-color:var(--accent);
+  box-shadow:var(--ring), inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35);
+}
+
+/* Autofill repaint (Chromium/WebKit and generic) */
+.auth-card input:is(:-webkit-autofill,:autofill),
+.card input:is(:-webkit-autofill,:autofill){
+  -webkit-text-fill-color: var(--text) !important;
+  -webkit-box-shadow: 0 0 0 1000px #0f182a inset !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35) !important;
+  border:1px solid var(--line) !important;
+}
+.auth-card input:is(:-webkit-autofill,:autofill):focus,
+.card input:is(:-webkit-autofill,:autofill):focus{
+  border-color:var(--accent) !important;
+  -webkit-box-shadow: var(--ring), 0 0 0 1000px #0f182a inset !important;
+}
+
+/* Actions + buttons — classed and unclassed */
+.actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.button,.btn,button,input[type="submit"]{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:10px 14px;border-radius:12px;border:1px solid var(--line);
+  cursor:pointer;text-decoration:none;color:var(--text);
+  background:#0f182a;transition:background .18s, border-color .18s, transform .06s, filter .18s, color .18s;
+  font-weight:600;letter-spacing:.1px;line-height:1.1;
+}
+.button:active,.btn:active,button:active,input[type="submit"]:active{transform:translateY(1px)}
+/* Primary (covers Sign in even if no classes) */
+button[type="submit"], input[type="submit"], .btn.primary, .button.primary{
+  background:linear-gradient(180deg,var(--accent),var(--accent-600));
+  border-color:transparent;
+  color:#0b0f17;
+  font-weight:700;
+}
+button[type="submit"]:hover, input[type="submit"]:hover, .btn.primary:hover, .button.primary:hover{
+  filter:saturate(1.05) brightness(1.02)
+}
+/* Secondary */
+.button.secondary,.btn.ghost{background:transparent}
+.button.secondary:hover,.btn.ghost:hover{background:rgba(255,255,255,.06)}
+
+/* Links */
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Footer */
+.footer{margin:26px auto 34px auto;max-width:720px;padding:0 16px;color:var(--muted);font-size:12px}
+
+/* Validation helpers */
+.is-invalid{border-color:#ef4444 !important}
+.is-valid{border-color:#22c55e !important}
+
+/* Motion */
+@keyframes fadeUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{0%{opacity:0;transform:scale(.985)}100%{opacity:1;transform:scale(1)}}
+.fade-up{animation:fadeUp .7s ease-out both}
+.scale-in{animation:scaleIn .7s ease-out both}
+.stagger-1{animation-delay:.06s}
+.stagger-2{animation-delay:.12s}
+.stagger-3{animation-delay:.18s}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .fade-up,.scale-in{animation:none}
+}
+
+/* Mobile */
+@media (max-width:520px){
+  .container{margin:7vh auto}
+  .card,.auth-card{padding:20px;border-radius:12px}
+  h1{font-size:24px}
+}
+
+/* 1) Force dark color-scheme for the auth forms (hints UA skins) */
+:root, body, .auth-card, .card, .container { color-scheme: dark; } /* [13] */
+
+/* 2) Exact-ID rules so the theme wins even if a password manager injects CSS */
+#username, #password {
+  background:#0f182a !important;
+  color:var(--text) !important;
+  border:1px solid var(--line) !important;
+  height:var(--field-h) !important;
+  max-width:100% !important;
+  border-radius:12px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35) !important;
+}
+#username:focus, #password:focus {
+  border-color: var(--accent) !important;
+  box-shadow: var(--ring), inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35) !important;
+}
+
+/* 3) Repaint autofill across engines (Chromium/WebKit + forgiving list) */
+#username:is(:-webkit-autofill, :autofill),
+#password:is(:-webkit-autofill, :autofill) {
+  -webkit-text-fill-color: var(--text) !important;
+  -webkit-box-shadow: 0 0 0 1000px #0f182a inset !important; /* big inset repaint */
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35) !important;
+  border:1px solid var(--line) !important;
+}
+#username:is(:-webkit-autofill, :autofill):focus,
+#password:is(:-webkit-autofill, :autofill):focus {
+  border-color: var(--accent) !important;
+  -webkit-box-shadow: var(--ring), 0 0 0 1000px #0f182a inset !important;
+}
+
+/* 4) Style the submit button even if it has no classes (Sign in) */
+.auth-card button[type="submit"],
+.card button[type="submit"],
+.auth-card input[type="submit"],
+.card input[type="submit"]{
+  background:linear-gradient(180deg, var(--accent), var(--accent-600)) !important;
+  color:#0b0f17 !important;
+  border:0 !important;
+  font-weight:700 !important;
+  letter-spacing:.15px !important;
+  line-height:1.1 !important;
+  padding:10px 14px !important;
+  border-radius:12px !important;
+}
+
+/* 5) Safety guards */
+.auth-card, .card { overflow: hidden }        /* no field bleed */
+
+/* Force dark scheme to reduce UA skins */
+:root, body, .auth-card, .card { color-scheme: dark; }
+
+/* Normalize username/password boxes exactly */
+#username, #password{
+  height:48px !important;
+  border-radius:12px !important;
+  background:#0f182a !important;
+  border:1px solid #1e293b !important;
+  color:#e5e7eb !important;
+  padding:0 14px 0 14px !important;
+  max-width:100% !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35) !important;
+}
+#username:focus,#password:focus{
+  border-color:#6aa5ff !important;
+  box-shadow: 0 0 0 3px rgba(106,165,255,.24), inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35) !important;
+}
+
+/* Repaint autofill so the dark theme wins */
+#username:is(:-webkit-autofill,:autofill),
+#password:is(:-webkit-autofill,:autofill){
+  -webkit-text-fill-color:#e5e7eb !important;
+  -webkit-box-shadow: 0 0 0 1000px #0f182a inset !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35) !important;
+  border:1px solid #1e293b !important;
+}
+
+/* Hide Safari/Chrome contacts/credentials buttons that distort the box */
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button{
+  visibility:hidden; display:none !important; pointer-events:none; width:0; height:0; margin:0;
+}
+
+/* Some builds wrap those buttons in a decoration container */
+input::-webkit-textfield-decoration-container{ display:none; }
+
+/* Force dark control skin */
+:root, body, .auth-card, .card { color-scheme: dark; } /* [MDN color-scheme] [15] */
+
+/* Normalize box model and appearance so width:100% is truly full */
+.auth-card input[type="text"], .card input[type="text"],
+.auth-card input[type="password"], .card input[type="password"]{
+  display:block !important;
+  width:100% !important;          /* full width in the card */             /* [10] */
+  min-width:0 !important;         /* prevents min-content shrinking */     /* [7] */
+  max-width:none !important;
+  box-sizing:border-box !important;/* include border+padding in width */   /* [1][8] */
+  appearance:textfield; -webkit-appearance:textfield; -moz-appearance:textfield; /* unify native look */ /* [9] */
+}
+
+/* Exact IDs to beat any injected styles from password managers */
+#username, #password{
+  height:48px !important; border-radius:12px !important;
+  background:#0f182a !important; color:#e5e7eb !important;
+  border:1px solid #1e293b !important; padding:0 14px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35) !important;
+}
+#username:focus, #password:focus{
+  border-color:#6aa5ff !important;
+  box-shadow: 0 0 0 3px rgba(106,165,255,.24), inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35) !important;
+}
+
+/* Repaint autofill so username uses the same dark fill as password */
+#username:is(:-webkit-autofill,:autofill),
+#password:is(:-webkit-autofill,:autofill){
+  -webkit-text-fill-color:#e5e7eb !important;
+  -webkit-box-shadow: 0 0 0 1000px #0f182a inset !important;  /* big inset repaint */ /* [11][16] */
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35) !important;
+  border:1px solid #1e293b !important;
+}
+
+/* Hide contacts/credentials UI that shortens the username field */
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button{ visibility:hidden; display:none !important; pointer-events:none; width:0; height:0; margin:0; } /* [12] */
+input::-webkit-textfield-decoration-container{ display:none; } /* container for those buttons in some engines */ /* [12] */

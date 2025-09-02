@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom classes used by your landing markup */
+.glass { background: rgba(255,255,255,.06); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,.12) }
+.grad-text { background: linear-gradient(90deg,#c084fc 0%,#6aa5ff 50%,#22d3ee 100%); -webkit-background-clip:text; background-clip:text; color:transparent }
+.btn-shine{ position:relative; overflow:hidden }
+.btn-shine:before{ content:""; position:absolute; inset:-100% auto auto -50%; width:50%; transform:rotate(25deg); background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent); animation:shine 2.8s linear infinite }
+@keyframes shine{ 0%{left:-60%} 60%{left:120%} 100%{left:120%} }

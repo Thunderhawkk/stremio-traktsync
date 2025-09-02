@@ -1,0 +1,33 @@
+@import "./styles/tokens.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; } /* theme toggle */ /* [6] */
+:root[data-density="compact"] * { --space-y: .5rem; }
+:root[data-density="compact"] .h-10 { height: 2.25rem; }
+
+html, body, #root { height: 100%; }
+body { background: var(--color-bg); color: var(--color-fg); }
+
+:root[data-bg="on"] body::before{
+  content:""; position:fixed; inset:-20%; z-index:-1;
+  background:
+    radial-gradient(1200px 800px at 10% -10%, rgba(106,165,255,.14), transparent 60%),
+    radial-gradient(900px 700px at 100% 110%, rgba(255,107,107,.10), transparent 55%);
+  opacity:.9;
+} /* [6] */
+
+@keyframes elevateIn { from { opacity:.0; transform: translateY(6px);} to { opacity:1; transform:none; } }
+.animate-elevate { animation: elevateIn .26s cubic-bezier(.22,.61,.36,1) both; } /* [3] */
+
+@keyframes slideDown { from { height: 0; opacity: 0; } to { height: var(--radix-accordion-content-height); opacity: 1; } }
+@keyframes slideUp   { from { height: var(--radix-accordion-content-height); opacity: 1; } to { height: 0; opacity: 0; } }
+.accordion-content[data-state="open"]  { overflow:hidden; animation: slideDown .22s ease-out; }
+.accordion-content[data-state="closed"]{ overflow:hidden; animation: slideUp   .22s ease-in; } /* [5] */
+
+.banner{ border-radius: .625rem; padding:.5rem .75rem; border:1px solid var(--bd, rgba(255,255,255,.12)); }
+.banner.info{ background: var(--color-surface-2); border-color: rgba(106,165,255,.35); }
+.banner.ok{ background: rgba(76,175,80,.18); border-color: rgba(76,175,80,.35); }
+.banner.err{ background: rgba(255,107,107,.18); border-color: rgba(255,107,107,.45); }

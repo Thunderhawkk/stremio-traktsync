@@ -1,0 +1,30 @@
+[
+  {
+    "id": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "username": "Yash",
+    "email": null,
+    "passwordHash": "$2b$11$R3El7s..82NPMmTDrgkv3u2br3cbIHINYiqAc.MfBmOw4N6VUwbiG",
+    "role": "admin",
+    "createdAt": "2025-08-26T14:52:37.871Z",
+    "updatedAt": "2025-08-26T14:52:37.871Z",
+    "lastLoginAt": "2025-09-02T02:10:42.352Z",
+    "addonToken": "d361fa0d48b7ab632eeaea7b292b6154"
+  },
+  {
+    "id": "269c0fb6-cfcd-489f-8449-f71f2fd1912a",
+    "username": "Neeta",
+    "email": null,
+    "passwordHash": "$2b$11$lu7oDK1YLOsW1oD4YbRiF.pawKFon/cvdkAEEdr0YdFWT/2fpCzIi",
+    "role": "user",
+    "createdAt": "2025-08-27T01:18:05.449Z",
+    "updatedAt": "2025-08-27T01:18:05.449Z",
+    "lastLoginAt": "2025-08-31T08:56:35.247Z"
+  },
+  {
+    "id": "f134aab0-5a80-4b25-8e30-0bc3f87b7519",
+    "email": null,
+    "role": "user",
+    "createdAt": "2025-08-31T01:59:26.158Z",
+    "updatedAt": "2025-08-31T01:59:26.158Z"
+  }
+]

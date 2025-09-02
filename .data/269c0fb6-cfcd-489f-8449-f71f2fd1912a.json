@@ -1,0 +1,41 @@
+{
+  "lists": [
+    {
+      "id": "b911673d-0b92-4966-9b5d-1d3d4dd2db95",
+      "name": "Hindi Movies",
+      "url": "https://trakt.tv/users/thunderhawkhh/lists/new-hindi-releases?sort=rank,asc",
+      "type": "movie",
+      "sortBy": "year",
+      "sortOrder": "",
+      "enabled": true,
+      "order": 0,
+      "userId": "269c0fb6-cfcd-489f-8449-f71f2fd1912a",
+      "createdAt": "2025-08-31T08:46:05.179Z",
+      "updatedAt": "2025-08-31T08:46:05.179Z"
+    },
+    {
+      "id": "070478b3-e13c-420c-8eb7-fefb45d435d5",
+      "name": "South Indian Movies",
+      "url": "https://trakt.tv/users/madmax2004/lists/south-indian?sort=released,asc",
+      "type": "movie",
+      "sortBy": "year",
+      "sortOrder": "",
+      "enabled": true,
+      "order": 1,
+      "userId": "269c0fb6-cfcd-489f-8449-f71f2fd1912a",
+      "createdAt": "2025-08-31T08:46:05.179Z",
+      "updatedAt": "2025-08-31T08:46:05.179Z"
+    }
+  ],
+  "addonToken": "f4579323d3bfb0823fdd438780a2ce70",
+  "traktTokens": {
+    "access_token": "6a19a68850f0017a1535c168cf75c795927364382646f3c4c18f5f156ab60d51",
+    "refresh_token": "2467bd69c66db588b5b349386eeb4952f55f87bfe7bcc494d5a1e95a7778833d",
+    "expires_at": "1970-01-22T07:59:40.763Z"
+  },
+  "manifestVersion": 1,
+  "lastAutoRefreshAt": "2025-09-02T02:55:16.771Z",
+  "lastManualRefreshAt": null,
+  "addonName": "Trakt",
+  "catalogPrefix": ""
+}

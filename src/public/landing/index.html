@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TraktSync · Stremio Add‑on + Web Dashboard</title>
+  <!-- Use the compiled stylesheet instead of the CDN -->
+  <link rel="stylesheet" href="/u/assets/landing.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css"/>
+</head>
+<body class="min-h-screen text-slate-100 bg-bg bg-radial-fade selection:bg-primary/30 selection:text-white">
+  <header class="sticky top-0 z-40 border-b border-white/10 bg-bg/70 backdrop-blur">
+    <div class="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-accent to-primary shadow-glow animate-float"></div>
+        <span class="text-sm tracking-widest uppercase text-white/70">TraktSync</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm text-white/70">
+        <a href="#features" class="hover:text-white transition-colors">Features</a>
+        <a href="#how" class="hover:text-white transition-colors">How it works</a>
+        <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="/dashboard" class="btn-shine rounded-lg px-3.5 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 border border-white/10">Open Dashboard</a>
+        <a href="#install" class="btn-shine rounded-lg px-3.5 py-2 text-sm font-semibold bg-primary hover:bg-primary/90 shadow-glow">Install Add‑on</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="relative overflow-hidden">
+    <div class="mx-auto max-w-7xl px-6 pt-14 pb-16 md:pt-20 md:pb-24 grid md:grid-cols-2 gap-10">
+      <div data-aos="fade-up">
+        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
+          Personal Trakt lists as beautiful <span class="grad-text">Stremio</span> catalogs.
+        </h1>
+        <p class="mt-5 text-white/70 max-w-2xl">
+          Sync Trakt lists, customize catalog grouping and names, then browse them in Stremio with blazing‑fast, paginated catalogs and filters.
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href="#install" class="btn-shine rounded-lg px-5 py-3 font-semibold bg-primary hover:bg-primary/90 shadow-glow">Install Add‑on</a>
+          <a href="/dashboard" class="rounded-lg px-5 py-3 font-semibold bg-white/10 hover:bg-white/15 border border-white/10">Open Dashboard</a>
+        </div>
+        <div class="mt-6 flex items-center gap-4 text-xs text-white/50">
+          <span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full bg-emerald-400 animate-pulse-soft"></span> Offline‑safe manifest fetch</span>
+          <span>Token‑protected per‑user endpoints</span>
+        </div>
+      </div>
+
+      <div class="relative" data-aos="fade-up" data-aos-delay="100">
+        <div class="glass rounded-2xl p-3 border-white/10 shadow-glow">
+          <img alt="preview" class="rounded-xl" src="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' width='900' height='560'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236aa5ff'/><stop offset='100%' stop-color='%23c084fc'/></linearGradient></defs><rect width='900' height='560' fill='%2310161f'/><rect x='40' y='40' width='820' height='480' rx='18' fill='url(%23g)' opacity='0.12'/><text x='60' y='100' fill='%23ffffff' opacity='0.75' font-family='Inter' font-size='28'>Stremio · Trakt catalogs</text><text x='60' y='150' fill='%23ffffff' opacity='0.55' font-family='Inter' font-size='18'>Demo placeholder image</text></svg>"/>
+        </div>
+        <div class="absolute -bottom-6 -left-6 blur-2xl h-40 w-40 bg-accent/25 rounded-full"></div>
+        <div class="absolute -top-6 -right-6 blur-2xl h-40 w-40 bg-primary/25 rounded-full"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="py-16 md:py-24">
+    <div class="mx-auto max-w-7xl px-6">
+      <h2 class="text-2xl md:text-3xl font-bold mb-10" data-aos="fade-up">Features built for power‑users</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="glass rounded-xl p-6 border-white/10" data-aos="fade-up">
+          <div class="text-primary mb-3">🔄</div>
+          <h3 class="font-semibold mb-2">Two‑way Trakt sync</h3>
+          <p class="text-white/70 text-sm">Import personal lists and keep catalogs fresh with scheduled pulls and on‑demand refreshes.</p>
+        </div>
+        <div class="glass rounded-xl p-6 border-white/10" data-aos="fade-up" data-aos-delay="50">
+          <div class="text-primary mb-3">🧭</div>
+          <h3 class="font-semibold mb-2">Custom catalog group</h3>
+          <p class="text-white/70 text-sm">Choose a Catalog Prefix to appear as its own group in Stremio’s left selector.</p>
+        </div>
+        <div class="glass rounded-xl p-6 border-white/10" data-aos="fade-up" data-aos-delay="100">
+          <div class="text-primary mb-3">⚡</div>
+          <h3 class="font-semibold mb-2">Fast, paginated catalogs</h3>
+          <p class="text-white/70 text-sm">Server‑side pagination with filters for year, rating, runtime, and genre.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="py-16 md:py-24">
+    <div class="mx-auto max-w-7xl px-6">
+      <h2 class="text-2xl md:text-3xl font-bold mb-10" data-aos="fade-up">How it works (3 steps)</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="glass rounded-xl p-6 border-white/10" data-aos="fade-up">
+          <div class="text-white/80 text-sm">Step 1</div>
+          <h3 class="font-semibold mt-1 mb-2">Connect Trakt</h3>
+          <p class="text-white/70 text-sm">Authorize from the dashboard and pull lists automatically.</p>
+        </div>
+        <div class="glass rounded-xl p-6 border-white/10" data-aos="fade-up" data-aos-delay="50">
+          <div class="text-white/80 text-sm">Step 2</div>
+          <h3 class="font-semibold mt-1 mb-2">Customize names</h3>
+          <p class="text-white/70 text-sm">Set Add‑on Name and Catalog Prefix, then preview filters.</p>
+        </div>
+        <div class="glass rounded-xl p-6 border-white/10" data-aos="fade-up" data-aos-delay="100">
+          <div class="text-white/80 text-sm">Step 3</div>
+          <h3 class="font-semibold mt-1 mb-2">Install in Stremio</h3>
+          <p class="text-white/70 text-sm">Copy the personal manifest URL and paste it in Stremio.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="install" class="py-16 md:py-24">
+    <div class="mx-auto max-w-5xl px-6 text-center">
+      <h2 class="text-2xl md:text-3xl font-bold mb-4" data-aos="fade-up">Ready to browse personal catalogs?</h2>
+      <p class="text-white/70 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="50">Open the dashboard to connect Trakt, add lists, and copy the personal manifest link for Stremio installation.</p>
+      <div class="mt-8 flex justify-center gap-3" data-aos="fade-up" data-aos-delay="100">
+        <a href="/dashboard" class="btn-shine rounded-lg px-5 py-3 font-semibold bg-primary hover:bg-primary/90 shadow-glow">Open Dashboard</a>
+        <a href="/u/install" class="rounded-lg px-5 py-3 font-semibold bg-white/10 hover:bg-white/15 border border-white/10">Add‑on Homepage</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/10 py-8">
+    <div class="mx-auto max-w-7xl px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="text-xs text-white/50">© 2025 TraktSync — Self‑hosted Stremio add‑on</div>
+      <div class="flex gap-4 text-xs text-white/60">
+        <a href="/u/install" class="hover:text-white">Add‑on homepage</a>
+        <a href="/dashboard" class="hover:text-white">Open dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init({ duration: 700, once: true, offset: 60 });</script>
+</body>
+</html>

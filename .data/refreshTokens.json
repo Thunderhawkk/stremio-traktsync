@@ -1,0 +1,170 @@
+[
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "7bfb8fb68aa3642e7d03a1402d1560819bb01f1e77711b58b748e0cfe649895f",
+    "issuedAt": "2025-08-26T14:52:43.930Z",
+    "revokedAt": "2025-08-26T14:54:53.657Z"
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "bd4540b9bd60d968ea840c1f0bea5909d1a23a35928be8ff4866dcc3b0c6c24c",
+    "issuedAt": "2025-08-26T14:54:53.659Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "08f6306e1b211a1315cd8c970525ba4654dab9da38a04276aa0c27f9e3c36435",
+    "issuedAt": "2025-08-26T15:25:27.536Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "dbd320bda94390149d7fd15976c52cbfc8b7997ee3c92346909935ddd3b0f956",
+    "issuedAt": "2025-08-26T16:08:10.175Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "6d8909576c9dddaaf5e40685a2f23e4a003f74fac9f002cdef5b52a9a285a028",
+    "issuedAt": "2025-08-26T16:38:16.847Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "6da3600321efc3a645f667f37f2a7388a7ff5cc7d34c36d18a978dc8322a6e0e",
+    "issuedAt": "2025-08-26T17:08:41.119Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "4b31356f5df45202ab3c5e9b195c01bda0612c0009b1f09cf51903967be47294",
+    "issuedAt": "2025-08-26T17:42:15.986Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "94b60470969584ac77d8c1d4c6a5fb327b109fd50e03de3b01d770b3f499dbfc",
+    "issuedAt": "2025-08-26T20:36:29.891Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "8c9b78137393454ea44621658d829ab87b62988cece4937e09feda3d700dffab",
+    "issuedAt": "2025-08-26T21:08:01.691Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "8e24b4e7a195b612b2cbdd42a32d5052b70e22cfb7c54b240321ad5ee6288e99",
+    "issuedAt": "2025-08-26T21:39:01.399Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "cbd14744869ab12e514aad8a74211e2387d097c38b0ae042ba256fd4923308cb",
+    "issuedAt": "2025-08-26T22:38:34.565Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "f517698c3befb793fb3d1339ed536d7bb1cfb6284433ab93764dbe91abc4b0a9",
+    "issuedAt": "2025-08-26T23:39:40.330Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "ec06be6940bdf323b3d274ed29d206daaadd136f03b878cbf2bcaa54ba0f6bef",
+    "issuedAt": "2025-08-27T00:04:26.346Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "af57f5713b7843d116a4eb54649e3f0d5483a5b0c0dcfeaa70cd26164fbffa90",
+    "issuedAt": "2025-08-27T00:37:00.593Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "71f0fa724017dde37e510784e562ed817fb9ca2069b92023065f3cf73fb2b6de",
+    "issuedAt": "2025-08-27T01:08:25.109Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "269c0fb6-cfcd-489f-8449-f71f2fd1912a",
+    "refreshTokenHash": "baf51587285a064f606d2ea1a7296e7cc905503dda57297e4206726a4bf30fe7",
+    "issuedAt": "2025-08-27T01:18:10.819Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "b1d92f4a41572db79e14f8247dc69c11d054c7e248af6e8fbd12351f815cf39b",
+    "issuedAt": "2025-08-27T09:43:42.844Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "292f06c90d00ad552f68d758f8f84213734fa0e05e7e92eb32f7c7659307a431",
+    "issuedAt": "2025-08-27T11:05:56.084Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "269c0fb6-cfcd-489f-8449-f71f2fd1912a",
+    "refreshTokenHash": "0e03baaf11013ec7f5e0c2ac362f6a7ed3273c1b617f2abe4000e5f9ee6fb450",
+    "issuedAt": "2025-08-27T11:06:47.244Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "3dc98e0362f9cb98b965a4cebec221a64cce59c6dbab4572ebe93c5626822250",
+    "issuedAt": "2025-08-27T11:21:49.830Z",
+    "revokedAt": "2025-08-27T11:28:30.217Z"
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "5212b298804344a2a51743a99e58c1dca89a9fbc6850673d1af0ce3985356595",
+    "issuedAt": "2025-08-27T11:28:35.601Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "b301adefa3dffbcdfe1f627d8a7588b9308a67fa3b05a13faf78d2f79346e03d",
+    "issuedAt": "2025-08-27T11:58:55.049Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "20c58a742d286b9904c30428a005835c29913605b45f176e9e3252dc2ac9db20",
+    "issuedAt": "2025-08-27T12:30:39.057Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "41da9223015f6e094af22b1a88754efdb25a8cf28ea40bb31c5fc4213f0dc3b8",
+    "issuedAt": "2025-08-28T08:17:39.610Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "ac1e1a03ceb456835ce153797b4aa90b28966c0f9a163002a5ead7d9c359ae65",
+    "issuedAt": "2025-08-28T11:52:10.971Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "1de31f57c80f8411f0a5f71d2982cd0052c0435efa00515dd2e2816ff568d2fc",
+    "issuedAt": "2025-08-28T12:05:20.152Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "5af64db917c1188f6d452f0261c025929c6835c6cf692edcf326e5dac1920c3a",
+    "issuedAt": "2025-08-28T12:35:57.521Z",
+    "revokedAt": null
+  },
+  {
+    "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+    "refreshTokenHash": "d5ea1b648210e0d30a1e5669f4344332a4ac9d7b2daddd4a71d746af499326a5",
+    "issuedAt": "2025-08-28T13:07:06.985Z",
+    "revokedAt": null
+  }
+]

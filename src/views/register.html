@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Register — Trakt Lists</title>
+
+    <!-- New themed stylesheet (served at /css/auth.css) -->
+    <link rel="stylesheet" href="/css/auth.css?v=2025-08-31-1707" />
+
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <div class="brand">
+          <div class="brand-badge"></div>
+          <div class="site">Trakt Lists</div>
+        </div>
+        <div class="spacer"></div>
+        <button id="themeToggle" class="theme-toggle btn ghost" type="button" aria-label="Toggle theme">
+          <span>Theme</span>
+        </button>
+      </header>
+
+      <main class="container">
+        <div class="card" style="max-width:520px;margin:0 auto;">
+          <h1 style="margin:0 0 6px 0;">Create account</h1>
+          <p class="small" style="margin-top:0;">Set up access to configure your Trakt lists.</p>
+
+          <form id="regForm" novalidate>
+            <label for="username">Username</label>
+            <input id="username" name="username" autocomplete="username" required />
+
+            <label for="email">Email (optional)</label>
+            <input id="email" name="email" type="email" autocomplete="email" />
+
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" required />
+
+            <div class="actions">
+              <button type="submit" class="btn primary">Create account</button>
+              <a class="button secondary btn ghost" href="/login" style="text-decoration:none;">Back to login</a>
+            </div>
+
+            <div id="msg" class="small" aria-live="polite" style="min-height:1.2em;margin-top:8px;"></div>
+          </form>
+        </div>
+      </main>
+
+      <footer class="footer small">© Trakt Lists</footer>
+    </div>
+
+    <!-- Existing behavior preserved -->
+    <script src="/public/theme.js"></script>
+    <script src="/public/register.js"></script>
+
+    <!-- Single, lightweight animation initializer (deduped) -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document
+          .querySelectorAll('.auth-card,.card,.tabs-sticky,.actions')
+          .forEach((el, i) => {
+            el.classList.add(i % 2 ? 'fade-up' : 'scale-in');
+            el.classList.add(`stagger-${(i % 3) + 1}`);
+          });
+      });
+    </script>
+  </body>
+</html>
