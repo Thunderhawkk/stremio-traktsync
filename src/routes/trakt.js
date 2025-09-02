@@ -4,6 +4,7 @@ const fetch = require('node-fetch');
 const { authRequired } = require('../middleware/auth');
 const { repo } = require('../db/repo');
 const { limiterTraktDevice, limiterStatusLight } = require('../middleware/rate_limit');
+const { getRefreshSchedule } = require('../jobs/scheduler');
 
 const router = express.Router();
 
@@ -37,6 +38,27 @@ router.get('/token/status', authRequired, limiterStatusLight, noCache, async (re
     });
   }catch(e){
     res.status(500).json({ connected:false, error:String(e&&e.message||e) });
+  }
+});
+
+router.get('/schedule', authRequired, async (req, res) => {
+  try {
+    const sched = getRefreshSchedule();
+    const tt = await repo.getTraktTokens(req.user.id).catch(() => null);
+    let user_auto_refresh_at = null;
+    if (tt?.expires_at) {
+      const skew = Number(sched.skew_ms || 0);
+      const expMs = Date.parse(tt.expires_at);
+      if (Number.isFinite(expMs)) user_auto_refresh_at = new Date(Math.max(0, expMs - skew)).toISOString();
+    }
+    res.json({
+      next_sweep_at: sched.next_sweep_at,
+      interval_ms: sched.interval_ms,
+      skew_ms: sched.skew_ms,
+      user_auto_refresh_at
+    });
+  } catch (e) {
+    res.status(500).json({ error: String(e?.message || e) });
   }
 });
 

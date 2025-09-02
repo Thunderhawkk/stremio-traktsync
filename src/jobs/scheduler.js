@@ -1,22 +1,43 @@
 // src/jobs/scheduler.js
-// Provides: start(), refreshAllTokens(), prewarmPopularCatalogs()
+// Provides: start(), refreshAllTokens(), prewarmPopularCatalogs(), getRefreshSchedule()
 
 const fetch = require('node-fetch');
 const { repo } = require('../db/repo');
 const { logger } = require('../utils/logger');
 const { markWarmed } = require('../utils/cache');
 
+// Trakt app credentials (required for refresh)
 const TRAKT_CLIENT_ID = process.env.TRAKT_CLIENT_ID || '';
 const TRAKT_CLIENT_SECRET = process.env.TRAKT_CLIENT_SECRET || '';
 
-const REFRESH_INTERVAL_MS = Number(process.env.TOKEN_REFRESH_INTERVAL_MS || 15 * 60 * 1000);
-const PREWARM_INTERVAL_MS = Number(process.env.PREWARM_INTERVAL_MS || 6 * 60 * 60 * 1000);
-const REFRESH_SKEW_MS = Number(process.env.TOKEN_REFRESH_SKEW_MS || 10 * 60 * 1000);
+// Interval: every 30 minutes (override with TOKEN_REFRESH_INTERVAL_MS)
+const REFRESH_INTERVAL_MS = Number(process.env.TOKEN_REFRESH_INTERVAL_MS || (30 * 60 * 1000));
+
+// Prewarm loop (unchanged; override with PREWARM_INTERVAL_MS)
+const PREWARM_INTERVAL_MS = Number(process.env.PREWARM_INTERVAL_MS || (6 * 60 * 60 * 1000));
+
+// Early refresh threshold: 1 hour 30 minutes (override with TOKEN_REFRESH_SKEW_MS)
+const REFRESH_SKEW_MS = Number(process.env.TOKEN_REFRESH_SKEW_MS || (90 * 60 * 1000));
+
+// Exposed schedule for UI countdowns
+let nextRefreshSweepAt = new Date(Date.now() + REFRESH_INTERVAL_MS).toISOString();
+let nextPrewarmAt      = new Date(Date.now() + PREWARM_INTERVAL_MS).toISOString();
+
+function getRefreshSchedule() {
+  return {
+    next_sweep_at: nextRefreshSweepAt,
+    interval_ms: REFRESH_INTERVAL_MS,
+    skew_ms: REFRESH_SKEW_MS,
+    next_prewarm_at: nextPrewarmAt
+  };
+}
+
+// ---- Trakt refresh helpers ----
 
 async function refreshTraktPair({ clientId, clientSecret, refreshToken }) {
   const r = await fetch('https://api.trakt.tv/oauth/token', {
-    method:'POST',
-    headers: { 'Content-Type':'application/json' },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       client_id: clientId,
       client_secret: clientSecret,
@@ -26,7 +47,7 @@ async function refreshTraktPair({ clientId, clientSecret, refreshToken }) {
     })
   });
   if (!r.ok) {
-    const t = await r.text().catch(()=> '');
+    const t = await r.text().catch(() => '');
     const err = new Error(`refresh_failed ${r.status} ${t}`);
     err.status = r.status;
     throw err;
@@ -34,18 +55,18 @@ async function refreshTraktPair({ clientId, clientSecret, refreshToken }) {
   return r.json();
 }
 
-function needsRefresh(expires_at){
+function needsRefresh(expires_at) {
   if (!expires_at) return true;
   const exp = new Date(expires_at).getTime();
   return (exp - Date.now()) <= REFRESH_SKEW_MS;
 }
 
-async function refreshAllTokens(){
+async function refreshAllTokens() {
   if (!TRAKT_CLIENT_ID || !TRAKT_CLIENT_SECRET) {
-    return { refreshed:0, failed:0, reauthNeeded:0, note:'Missing Trakt client credentials' };
+    return { refreshed: 0, failed: 0, reauthNeeded: 0, note: 'Missing Trakt client credentials' };
   }
   const users = await repo.listUsers();
-  let refreshed=0, failed=0, reauthNeeded=0;
+  let refreshed = 0, failed = 0, reauthNeeded = 0;
 
   for (const u of users) {
     try {
@@ -59,14 +80,14 @@ async function refreshAllTokens(){
         refreshToken: tt.refresh_token
       });
 
-      const expiresAtIso = out.created_at
-        ? new Date(out.created_at + out.expires_in * 1000).toISOString()
-        : new Date(Date.now() + out.expires_in * 1000).toISOString();
+      // FIX: created_at is seconds; convert to ms and add expires_in (seconds) as ms
+      const createdMs = Number.isFinite(out?.created_at) ? (out.created_at * 1000) : Date.now();
+      const expiresAtIso = new Date(createdMs + (out.expires_in * 1000)).toISOString();
 
       await repo.upsertTraktTokens({
         userId: u.id,
         access_token: out.access_token,
-        refresh_token: out.refresh_token || tt.refresh_token,
+        refresh_token: out.refresh_token || tt.refresh_token, // token rotation
         expires_at: expiresAtIso
       });
       await repo.setLastAutoRefreshAt(u.id, new Date().toISOString());
@@ -74,43 +95,58 @@ async function refreshAllTokens(){
     } catch (e) {
       failed++;
       if (String(e && e.message || '').includes('invalid_grant')) reauthNeeded++;
-      logger.warn({ userId:u.id, err:String(e&&e.message||e) }, 'token_refresh_failed');
+      logger.warn({ userId: u.id, err: String(e && e.message || e) }, 'token_refresh_failed');
     }
   }
   return { refreshed, failed, reauthNeeded };
 }
 
-async function prewarmPopularCatalogs(){
+// ---- Prewarm top catalogs (optional) ----
+
+async function prewarmPopularCatalogs() {
   try {
     const users = await repo.listUsers();
     for (const u of users) {
       const lists = await repo.getLists(u.id);
-      const top = (lists||[]).filter(l => l.enabled !== false).slice(0,2);
+      const top = (lists || []).filter(l => l.enabled !== false).slice(0, 2);
       for (const l of top) {
         try {
           await fetch(`${process.env.BASE_URL || ''}/api/catalog/preview`, {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: u.id, listId: l.id })
-          }).catch(()=>{});
+          }).catch(() => {});
         } catch {}
       }
     }
     markWarmed();
   } catch (e) {
-    logger.warn({ err:String(e&&e.message||e) }, 'prewarm_failed');
+    const err = String(e && e.message || e);
+    logger.warn({ err }, 'prewarm_failed');
   }
 }
 
-function start(){
+// ---- Start timers ----
+
+function start() {
+  // Seed schedule references so UI countdown starts accurate
+  nextRefreshSweepAt = new Date(Date.now() + REFRESH_INTERVAL_MS).toISOString();
+  nextPrewarmAt      = new Date(Date.now() + PREWARM_INTERVAL_MS).toISOString();
+
+  // Background token refresh scan (every 30 minutes by default)
   setInterval(() => {
-    refreshAllTokens().then(sum => logger.info(sum, 'token_refresh_summary'))
-      .catch(err => logger.warn({ err:String(err&&err.message||err) }, 'token_refresh_loop_error'));
+    nextRefreshSweepAt = new Date(Date.now() + REFRESH_INTERVAL_MS).toISOString();
+    refreshAllTokens()
+      .then(sum => logger.info(sum, 'token_refresh_summary'))
+      .catch(err => logger.warn({ err: String(err && err.message || err) }, 'token_refresh_loop_error'));
   }, REFRESH_INTERVAL_MS);
 
+  // Optional prewarm loop
   setInterval(() => {
-    prewarmPopularCatalogs().catch(err => logger.warn({ err:String(err&&err.message||err) }, 'prewarm_loop_error'));
+    nextPrewarmAt = new Date(Date.now() + PREWARM_INTERVAL_MS).toISOString();
+    prewarmPopularCatalogs()
+      .catch(err => logger.warn({ err: String(err && err.message || err) }, 'prewarm_loop_error'));
   }, PREWARM_INTERVAL_MS);
 }
 
-module.exports = { start, refreshAllTokens, prewarmPopularCatalogs };
+module.exports = { start, refreshAllTokens, prewarmPopularCatalogs, getRefreshSchedule };

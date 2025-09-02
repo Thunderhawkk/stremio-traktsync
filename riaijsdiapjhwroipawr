@@ -1,0 +1,29 @@
+[33mcommit c61d28e9e8f0eeda565e5cfa8d0c714255d5a0ea[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Yash <shirsathyash2006@gmail.com>
+Date:   Tue Sep 2 17:33:43 2025 +0530
+
+    Stremio-Addon-Manager Working under Reorder tab
+
+[33mcommit be9a175d3a7c71e7a2ad68d79123dbdf6b6035f4[m
+Author: Yash <shirsathyash2006@gmail.com>
+Date:   Tue Sep 2 15:53:08 2025 +0530
+
+    Resolved merge conflicts
+
+[33mcommit 7340c2a946aee9bd9e279a2be84d6aa69f782851[m
+Author: Yash <shirsathyash2006@gmail.com>
+Date:   Tue Sep 2 15:45:12 2025 +0530
+
+    Update submodule to build-fixed commit and track .gitmodules
+
+[33mcommit 4055f44d12ab47135fe7c32fb594d483887a1dcc[m
+Author: Yash <shirsathyash2006@gmail.com>
+Date:   Tue Sep 2 15:39:52 2025 +0530
+
+    Add Stremio Addon Manager as submodule and wire /reorder
+
+[33mcommit 6a2be93ad49a7fb5a5d438a4ecf62295a730b232[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: Yash <shirsathyash2006@gmail.com>
+Date:   Tue Sep 2 15:18:44 2025 +0530
+
+    init

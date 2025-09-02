@@ -2,7 +2,7 @@
   "addonName": "TraktSync",
   "catalogPrefix": "TraktSync",
   "manifestVersion": 1,
-  "lastAutoRefreshAt": "2025-09-01T14:00:23.885Z",
+  "lastAutoRefreshAt": "2025-09-02T23:08:41.267Z",
   "lastManualRefreshAt": null,
   "lists": [
     {
@@ -15,12 +15,12 @@
       "enabled": true,
       "order": 0,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-01T16:27:49.388Z",
-      "updatedAt": "2025-09-01T16:27:49.388Z"
+      "createdAt": "2025-09-02T23:18:47.611Z",
+      "updatedAt": "2025-09-02T23:18:47.611Z"
     },
     {
       "id": "bebdd2b2-f7f0-4603-a1e1-83db8f8c0b65",
-      "name": "Latest 4K Remux Movies",
+      "name": "Latest 4K Remux",
       "url": "https://trakt.tv/users/amazing-journey/lists/latest-4k-remux?sort=added,asc",
       "type": "movie",
       "sortBy": "year",
@@ -28,14 +28,14 @@
       "enabled": true,
       "order": 1,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-01T16:27:49.388Z",
-      "updatedAt": "2025-09-01T16:27:49.388Z"
+      "createdAt": "2025-09-02T23:18:47.611Z",
+      "updatedAt": "2025-09-02T23:18:47.611Z"
     }
   ],
   "addonToken": "95de27d20f3805195e81e0b9daa349a2",
   "traktTokens": {
-    "access_token": "b962327ba28d42b3adf760193ed3adc31530053421db4883b4a3b8387112bc15",
-    "refresh_token": "58ca738b17b3537b61d2d965cf64fb6a8072eb0ec62a6fc8764fcce288c419f1",
-    "expires_at": "2025-09-02T14:01:09.000Z"
+    "access_token": "74b8437a39093fef00f2bab6a8d9e571fa2b5fe9a4958f8ed6d7a2a0231878fc",
+    "refresh_token": "fec49275bcbf8dc046033ecc937c3bb5d0cc3c6874b8369bc3d34af682d372ba",
+    "expires_at": "2025-09-03T23:09:27.000Z"
   }
 }
