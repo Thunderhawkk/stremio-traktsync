@@ -289,3 +289,71 @@ input::-webkit-textfield-decoration-container{ display:none; }
 input::-webkit-contacts-auto-fill-button,
 input::-webkit-credentials-auto-fill-button{ visibility:hidden; display:none !important; pointer-events:none; width:0; height:0; margin:0; } /* [12] */
 input::-webkit-textfield-decoration-container{ display:none; } /* container for those buttons in some engines */ /* [12] */
+
+/* Field row states */
+.form-row { margin: 12px 0; }
+.form-row.error input,
+.form-row.error select,
+.form-row.error textarea { border-color: #ef4444 !important; }
+.form-row.success input,
+.form-row.success select,
+.form-row.success textarea { border-color: #22c55e !important; }
+
+/* Buttons: clearer hover + focus */
+.button,.btn,button,input[type="submit"]{
+  transition: background .18s, border-color .18s, transform .06s, filter .18s, color .18s, box-shadow .18s;
+}
+.button:hover,.btn:hover,button:hover,input[type="submit"]:hover{
+  filter: saturate(1.04) brightness(1.02);
+}
+button[type="submit"]:focus-visible,
+input[type="submit"]:focus-visible{
+  box-shadow: var(--ring), 0 0 0 1px var(--accent) inset;
+}
+
+/* Inputs: slightly stronger hover and focus feedback */
+.auth-card input:hover,.card input:hover,
+.auth-card select:hover,.card select:hover,
+.auth-card textarea:hover,.card textarea:hover{
+  background:#11243f;
+}
+.auth-card input:focus,.card input:focus,
+.auth-card select:focus,.card select:focus,
+.auth-card textarea:focus,.card textarea:focus{
+  border-color:var(--accent);
+  box-shadow:var(--ring), inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35);
+}
+
+/* Field row states */
+.form-row { margin: 12px 0; }
+.form-row.error input,
+.form-row.error select,
+.form-row.error textarea { border-color: #ef4444 !important; }
+.form-row.success input,
+.form-row.success select,
+.form-row.success textarea { border-color: #22c55e !important; }
+
+/* Slightly stronger input hover/focus */
+.auth-card input:hover,.card input:hover,
+.auth-card select:hover,.card select:hover,
+.auth-card textarea:hover,.card textarea:hover{
+  background:#11243f;
+}
+.auth-card input:focus,.card input:focus,
+.auth-card select:focus,.card select:focus,
+.auth-card textarea:focus,.card textarea:focus{
+  border-color:var(--accent);
+  box-shadow:var(--ring), inset 0 1px 0 rgba(255,255,255,.05), inset 1px 1px 2px rgba(0,0,0,.35);
+}
+
+/* Buttons hover/focus polish */
+.button,.btn,button,input[type="submit"]{
+  transition: background .18s, border-color .18s, transform .06s, filter .18s, color .18s, box-shadow .18s;
+}
+.button:hover,.btn:hover,button:hover,input[type="submit"]:hover{
+  filter: saturate(1.04) brightness(1.02);
+}
+button[type="submit"]:focus-visible,
+input[type="submit"]:focus-visible{
+  box-shadow: var(--ring), 0 0 0 1px var(--accent) inset;
+}

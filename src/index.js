@@ -27,10 +27,6 @@ const stremioRoutes = require('./routes/stremio');
 
 const app = express();
 
-app.use('/api', listsRouter);
-app.use('/api/stremio', stremioRoutes);
-app.use('/reorder', express.static(path.join(__dirname, '..', 'vendor', 'stremio-addon-manager', 'dist')));
-
 // Security + perf
 app.set('etag', 'strong');
 app.use(compression({ threshold: '1kb' }));
@@ -53,31 +49,7 @@ app.use(helmet({
   referrerPolicy: { policy: 'no-referrer' }
 }));
 
-// Legacy static assets used by server-rendered pages
-app.use('/css',    express.static(path.join(__dirname, '..', 'public', 'css'), { immutable: true, maxAge: '7d' }));
-app.use('/public', express.static(path.join(__dirname, 'public'),             { immutable: true, maxAge: '7d' }));
-
-// Vite build mounts (must be before `pages` so SPA wins for /dashboard)
-const distDir = path.join(__dirname, '..', 'dashboard-ui', 'dist');
-
-// Serve built hashed assets at root so /assets/... works from any route
-app.use('/assets', express.static(path.join(distDir, 'assets'), { immutable: true, maxAge: '1y' })); // [root]/assets/*
-
-// Serve whole dist for convenience under /u and /dashboard
-app.use('/u',         express.static(distDir, { index: false }));
-app.use('/dashboard', express.static(distDir, { index: false }));
-
-// Landing (built HTML entry) at /install and /u/install
-app.get(['/install', '/u/install'], (req, res, next) => {
-  res.sendFile(path.join(distDir, 'landing.html'), err => err && next(err));
-});
-
-// SPA fallback ONLY for /dashboard routes (not for /login or /register)
-app.get(['/dashboard', '/dashboard/*'], (req, res) => {
-  res.sendFile(path.join(distDir, 'index.html'));
-});
-
-// Body + cookies
+// Body + cookies + CORS + sessions FIRST (before any route using req.session)
 app.use(express.json({ limit: '200kb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -110,10 +82,39 @@ app.use(attachSessionUser);
 app.use(absoluteSessionTimeout({ absoluteMs: ABS_MIN * 60 * 1000 }));
 app.use(limiterApp);
 
-// Default landing
-app.get('/', (_req, res) => res.redirect('/login'));
+// Legacy static assets used by server-rendered pages
+app.use('/css',    express.static(path.join(__dirname, '..', 'public', 'css'), { immutable: true, maxAge: '7d' }));
+app.use('/public', express.static(path.join(__dirname, 'public'),             { immutable: true, maxAge: '7d' }));
 
-app.get('/reorder/*', (req,res) => res.sendFile(path.join(__dirname, '..', 'vendor', 'stremio-addon-manager', 'dist', 'index.html')));
+// Vite build mounts (must be before `pages` so SPA wins for /dashboard)
+const distDir = path.join(__dirname, '..', 'dashboard-ui', 'dist');
+
+// Serve built hashed assets at root so /assets/... works from any route
+app.use('/assets', express.static(path.join(distDir, 'assets'), { immutable: true, maxAge: '1y' })); // [root]/assets/*
+
+// Serve whole dist for convenience under /u and /dashboard
+app.use('/u',         express.static(distDir, { index: false }));
+app.use('/dashboard', express.static(distDir, { index: false }));
+
+// Landing (built HTML entry) at bare URL and /install variants
+app.get('/', (req, res, next) => {
+  res.sendFile(path.join(distDir, 'landing.html'), err => err && next(err));
+});
+app.get(['/install', '/u/install'], (req, res, next) => {
+  res.sendFile(path.join(distDir, 'landing.html'), err => err && next(err));
+});
+
+// Protect dashboard shell: redirect unauthenticated to login
+app.get(['/dashboard', '/dashboard/*'], (req, res, next) => {
+  if (!req.session || !req.session.user) return res.redirect('/login');
+  res.sendFile(path.join(distDir, 'index.html'), err => err && next(err));
+});
+
+// Stremio Addon Manager static
+app.use('/reorder', express.static(path.join(__dirname, '..', 'vendor', 'stremio-addon-manager', 'dist')));
+app.get('/reorder/*', (req,res) =>
+  res.sendFile(path.join(__dirname, '..', 'vendor', 'stremio-addon-manager', 'dist', 'index.html'))
+);
 
 // IMPORTANT: server-rendered pages AFTER SPA mounts so /dashboard stays SPA.
 // This ensures /login and /register are handled by legacy templates (not SPA), fixing blank pages.
@@ -128,6 +129,10 @@ app.use('/api', configRoutes);
 
 // Trakt API
 app.use('/api/trakt', traktRoutes);
+
+// Lists + Stremio APIs
+app.use('/api', listsRouter);
+app.use('/api/stremio', stremioRoutes);
 
 // Addon public routes
 app.use('/u', addonRoutes);

@@ -66,6 +66,7 @@ function Shell(){
 export default function App(){
   return (
     <NotifyProvider>
+      <TopBar />
       <Shell />
     </NotifyProvider>
   );
