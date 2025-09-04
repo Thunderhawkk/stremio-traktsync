@@ -1,5 +1,4 @@
 // dashboard-ui/src/sections/ListsPanel.tsx
-
 import React, { useEffect, useState } from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import { DndContext, PointerSensor, useSensor, useSensors, closestCenter } from "@dnd-kit/core";
@@ -22,6 +21,7 @@ type ListItem = {
   yearMax?: string;
   ratingMin?: string;
   ratingMax?: string;
+  hideUnreleased?: boolean;
 };
 
 const rowId = (it: ListItem, idx: number) => it.id || `idx-${idx}`;
@@ -60,9 +60,10 @@ function SortableWrapper({
 export default function ListsPanel() {
   const [lists, setLists] = useState<ListItem[]>([]);
   const [busy, setBusy] = useState(false);
+  const [hideAll, setHideAll] = useState(false); // global override
 
   // Small drag threshold to avoid accidental drags on click
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } })); // [12]
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   async function load() {
     setBusy(true);
@@ -70,12 +71,24 @@ export default function ListsPanel() {
       const r = await fetch(`/api/config?ts=${Date.now()}`, { credentials: "include", cache: "no-store" });
       const data = r.ok ? await r.json() : { lists: [] };
       setLists((data.lists as ListItem[]) || []);
+      setHideAll(!!data.hideUnreleasedAll);
     } finally {
       setBusy(false);
     }
   }
+
+  useEffect(() => { load(); }, []);
+
+  // Listen for global settings updates (dispatched by CatalogSettings)
   useEffect(() => {
-    load();
+    function onCfg(ev: Event) {
+      const det = (ev as CustomEvent)?.detail;
+      if (det && typeof det.hideUnreleasedAll === "boolean") {
+        setHideAll(!!det.hideUnreleasedAll);
+      }
+    }
+    window.addEventListener("config:updated", onCfg as EventListener);
+    return () => window.removeEventListener("config:updated", onCfg as EventListener);
   }, []);
 
   function updateItem(idx: number, patch: Partial<ListItem>) {
@@ -87,14 +100,8 @@ export default function ListsPanel() {
   }
 
   async function save() {
-    const body = { lists: lists.map((x, i) => ({ ...x, order: i })) };
-    const r = await fetch(`/api/config`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    if (r.ok) await load();
+    const body = { lists: lists.map((x, i) => ({ ...x, order: i })) }; // hideUnreleased persists as-is
+    await fetch(`/api/config`, { method:"POST", credentials:"include", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body) });
   }
 
   async function removeItem(it: ListItem) {
@@ -126,6 +133,13 @@ export default function ListsPanel() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
     });
+  }
+
+  async function validateAll(){
+    const r = await fetch(`/api/validate-all`, { method:"POST", credentials:"include" });
+    const j = await r.json().catch(() => null);
+    if (!r.ok || !j) return;
+    // Optionally show a toast/banner with j.ok / j.failed summary
   }
 
   async function preview(it: ListItem) {
@@ -180,9 +194,8 @@ export default function ListsPanel() {
         <h2 className="text-lg font-semibold">Manage Trakt lists that power the addon.</h2>
         <div className="flex gap-2">
           <Button onClick={add}>Add list</Button>
-          <Button variant="secondary" onClick={save} disabled={busy}>
-            Save changes
-          </Button>
+          <Button variant="secondary" onClick={save} disabled={busy}>Save changes</Button>
+          <Button variant="secondary" onClick={validateAll} disabled={busy}>Validate all</Button>
         </div>
       </div>
 
@@ -213,8 +226,8 @@ export default function ListsPanel() {
                         {/* Keep switch OUTSIDE Trigger and stop bubbling */}
                         <div
                           className="pl-3"
-                          onPointerDown={(e) => e.stopPropagation()}  // prevent accordion toggle on pointer down [13]
-                          onClick={(e) => e.stopPropagation()}        // prevent click from toggling the row [13]
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <Switch
                             checked={!!it.enabled}
@@ -337,17 +350,23 @@ export default function ListsPanel() {
                           </div>
                         </div>
 
+                        {/* Per‑list Hide unreleased reflects global override */}
+                        <div className="mt-2">
+                          <label className="text-sm text-white/70">Hide unreleased</label>
+                          <div className="h-10 flex items-center">
+                            <Switch
+                              checked={hideAll || !!it.hideUnreleased}
+                              onCheckedChange={(v: boolean) => updateItem(idx, { hideUnreleased: v })}
+                              disabled={hideAll}
+                            />
+                          </div>
+                        </div>
+
                         {/* Row actions */}
                         <div className="mt-3 flex gap-2">
-                          <Button variant="secondary" onClick={() => validate(it)}>
-                            Validate
-                          </Button>
-                          <Button variant="secondary" onClick={() => preview(it)}>
-                            Preview
-                          </Button>
-                          <Button variant="destructive" onClick={() => removeItem(it)}>
-                            Delete
-                          </Button>
+                          <Button variant="secondary" onClick={() => validate(it)}>Validate</Button>
+                          <Button variant="secondary" onClick={() => preview(it)}>Preview</Button>
+                          <Button variant="destructive" onClick={() => removeItem(it)}>Delete</Button>
                         </div>
                       </Accordion.Content>
                     </Accordion.Item>

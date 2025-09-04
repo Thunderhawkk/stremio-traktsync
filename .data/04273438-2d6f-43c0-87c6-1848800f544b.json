@@ -6,7 +6,7 @@
   "lastManualRefreshAt": null,
   "lists": [
     {
-      "id": "47eaaf83-ab7a-4ade-96ed-4e8fcf8fd1f6",
+      "id": "e9cb853f-aa44-4c26-acf2-488319c50fee",
       "name": "New Hindi Releases",
       "url": "https://trakt.tv/users/me/lists/new-hindi-releases",
       "type": "movie",
@@ -14,9 +14,10 @@
       "sortOrder": "",
       "enabled": true,
       "order": 0,
+      "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-02T23:18:47.611Z",
-      "updatedAt": "2025-09-02T23:18:47.611Z"
+      "createdAt": "2025-09-04T00:44:51.309Z",
+      "updatedAt": "2025-09-04T00:44:51.309Z"
     },
     {
       "id": "bebdd2b2-f7f0-4603-a1e1-83db8f8c0b65",
@@ -27,15 +28,31 @@
       "sortOrder": "",
       "enabled": true,
       "order": 1,
+      "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-02T23:18:47.611Z",
-      "updatedAt": "2025-09-02T23:18:47.611Z"
+      "createdAt": "2025-09-04T00:44:51.309Z",
+      "updatedAt": "2025-09-04T00:44:51.309Z"
+    },
+    {
+      "id": "c62c64a2-1ead-4c5b-9886-5ec9a0a597ed",
+      "name": "South Indian Releases",
+      "url": "https://trakt.tv/users/madmax2004/lists/south-indian?sort=released,asc",
+      "type": "movie",
+      "sortBy": "year",
+      "sortOrder": "",
+      "enabled": true,
+      "order": 2,
+      "hideUnreleased": false,
+      "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
+      "createdAt": "2025-09-04T00:44:51.309Z",
+      "updatedAt": "2025-09-04T00:44:51.309Z"
     }
   ],
   "addonToken": "95de27d20f3805195e81e0b9daa349a2",
   "traktTokens": {
-    "access_token": "74b8437a39093fef00f2bab6a8d9e571fa2b5fe9a4958f8ed6d7a2a0231878fc",
-    "refresh_token": "fec49275bcbf8dc046033ecc937c3bb5d0cc3c6874b8369bc3d34af682d372ba",
-    "expires_at": "2025-09-03T23:09:27.000Z"
-  }
+    "access_token": "d5398bd1bae7e37313502aaaf6cdc0f69f058117005802a4e12d5cecda4c82fa",
+    "refresh_token": "c8b96e515d8fc815f0b02cbffd107211ca62df5de022ffdc02f30930472dcacb",
+    "expires_at": "2025-09-04T23:07:24.590Z"
+  },
+  "hideUnreleasedAll": false
 }

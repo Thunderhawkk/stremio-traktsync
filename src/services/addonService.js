@@ -1,13 +1,12 @@
 // src/services/addonService.js
 const { repo } = require('../db/repo');
-// FIX: import Trakt fetcher from the correct module (not state) [13]
-const { getUserListItems } = require('../services/traktService');
+const { getUserListItems } = require('../services/traktService'); // Trakt fetcher returns list items with extended fields (e.g., movie.released) [Trakt API]
 const { cache, k } = require('../utils/cache');
 
 // Optional settings reader (graceful fallback)
 let getUserSettings = null;
 try { ({ getUserSettings } = require('../state/userSettings')); }
-catch { getUserSettings = async () => ({ addonName: 'Trakt Lists', catalogPrefix: '' }); } // [3]
+catch { getUserSettings = async () => ({ addonName: 'Trakt Lists', catalogPrefix: '', hideUnreleasedAll: false }); }
 
 const PAGE_SIZE = 100;
 
@@ -39,10 +38,10 @@ function mapGenre(input){
   if (l.includes('western')) return 'Western';
   let t = s;
   let m = t.match(/^([A-Z]+)([a-z]+)$/);
-  if (m) { const upper = m[14], lower = m[15]; if (lower === upper.slice(1).toLowerCase()) t = upper; }
+  if (m) { const upper = m[3], lower = m[4]; if (lower === upper.slice(1).toLowerCase()) t = upper; }
   m = t.match(/^([A-Z][A-Z ]+)([a-z][a-z ]+)$/);
   if (m) {
-    const upper = m[14], lower = m[15];
+    const upper = m[3], lower = m[4];
     if (upper.slice(1).toLowerCase().replace(/\s+/g,' ') === lower.toLowerCase().replace(/\s+/g,' ')) t = upper;
   }
   return t.split(' ').map(w => w ? w.toUpperCase() + w.slice(1).toLowerCase() : w).join(' ');
@@ -79,7 +78,7 @@ function applySort(metas, sort, order){
   return arr;
 }
 
-// Make a safe label for manifest.types (left selector label) [12]
+// Make a safe label for manifest.types (left selector label)
 function toTypeLabel(input){
   const raw = String(input || '').trim() || 'MyTrakt';
   const noSpaces = raw.replace(/\s+/g, '');
@@ -89,22 +88,20 @@ function toTypeLabel(input){
 async function buildUserManifest({ userId, baseManifest }){
   const lists = await repo.getLists(userId);
 
-  // Read settings to determine top-level name and the custom catalog group label. [2]
-  const s = await getUserSettings(repo, userId).catch(() => ({ addonName: 'Trakt Lists', catalogPrefix: '' })); // safe fallback [2]
-  const addonName = s?.addonName || baseManifest.name || 'Trakt Lists'; // shown in Add-ons UI [2]
-  const prefix = (s?.catalogPrefix || '').trim();                        // user-defined prefix (may be empty) [1]
-  const customType = (prefix || addonName)                               // label used for the left selector (single group) [1]
-    .replace(/\s+/g, '')
-    .replace(/[^A-Za-z0-9]/g, '') || 'MyTrakt';
+  // Read settings to determine top-level name and the custom catalog group label.
+  const s = await getUserSettings(repo, userId).catch(() => ({ addonName: 'Trakt Lists', catalogPrefix: '' }));
+  const addonName = s?.addonName || baseManifest.name || 'Trakt Lists';
+  const prefix = (s?.catalogPrefix || '').trim();
+  const customType = (prefix || addonName).replace(/\s+/g, '').replace(/[^A-Za-z0-9]/g, '') || 'MyTrakt';
 
-  // Build catalogs under the custom type so the left selector shows one entry (e.g., "MyLoda"). [1]
-  // IMPORTANT: leave catalog.name as ONLY the list name to avoid "Prefix – Prefix · List" duplication in Home. [1]
+  // Build catalogs under a single custom type for a grouped left selector entry
+  // IMPORTANT: catalog.name is only the list name to avoid prefix duplication in Home
   const catalogs = (lists || [])
     .filter(l => l.enabled)
     .map(l => ({
-      type: customType,              // left selector entry (Prefix or AddonName when prefix is empty) [1]
+      type: customType,
       id: l.id,
-      name: l.name || 'List',        // pure list name; no prefix here [1]
+      name: l.name || 'List',
       extra: [
         { name: 'skip', isRequired: false },
         { name: 'sort', isRequired: false, options: ['rating','year','runtime','name'] },
@@ -115,26 +112,25 @@ async function buildUserManifest({ userId, baseManifest }){
         { name: 'ratingMin', isRequired: false },
         { name: 'ratingMax', isRequired: false }
       ],
-      __listType: l.type            // keep the real list type (movie/series) for fetching metas later [1]
+      __listType: l.type
     }));
 
-  // Only expose the custom type so Stremio shows that group next to Movies/Series from other add-ons. [1][2]
   const types = [customType];
 
-  // Keep meta resource so Cinemeta/meta lookups keep working. [3]
+  // Keep meta resource for Cinemeta/meta lookups
   const resources = Array.isArray(baseManifest.resources) && baseManifest.resources.length
     ? baseManifest.resources
     : ['catalog', { name: 'meta', types: ['movie','series'], idPrefixes: ['tt'] }];
 
   const manifest = {
     ...baseManifest,
-    name: addonName,      // top-level add‑on name [2]
+    name: addonName,
     resources,
     types,
-    catalogs              // catalog names are the pure list names; Home shows "CustomType – ListName" once [1]
+    catalogs
   };
 
-  // Warm cache page 0 per catalog (unchanged). [1]
+  // Warm cache page 0 per catalog
   setImmediate(() => {
     try{
       for (const c of catalogs){
@@ -151,7 +147,7 @@ async function fetchTraktSlice({ userId, urlOrSlug, stremioType, skip }){
   const pageStart = Math.floor(skip / 100) + 1;
   const offset = skip % 100;
   let out = [];
-  const p1 = await getUserListItems({ userId, urlOrSlug, stremioType, limit: 100, page: pageStart }); // Trakt service [13]
+  const p1 = await getUserListItems({ userId, urlOrSlug, stremioType, limit: 100, page: pageStart });
   const a1 = Array.isArray(p1) ? p1 : [];
   if (offset < a1.length) out = out.concat(a1.slice(offset));
   let nextPage = pageStart + 1;
@@ -184,7 +180,7 @@ async function getCatalog({ userId, type, catalogId, skip = 0, extras = {} }){
     const l = (lists || []).find(x => x.id === catalogId && x.enabled);
     if (!l) {
       const empty = { metas: [] };
-      cache.set(cacheKey, empty);
+      cache.set(cacheKey, { ...empty, _cachedAt: new Date().toISOString() });
       return { ...empty, _cached: false, _cachedAt: new Date().toISOString() };
     }
 
@@ -193,7 +189,7 @@ async function getCatalog({ userId, type, catalogId, skip = 0, extras = {} }){
     if (!effExtras.sort && l.sortBy) effExtras.sort = l.sortBy;
     if (!effExtras.order && l.sortOrder) effExtras.order = l.sortOrder;
 
-    // Fetch with the list’s real type (movie/series) so metas are correct [12]
+    // Fetch with the list’s real type (movie/series) so metas are correct
     const items = await fetchTraktSlice({
       userId,
       urlOrSlug: l.url,
@@ -201,8 +197,24 @@ async function getCatalog({ userId, type, catalogId, skip = 0, extras = {} }){
       skip: Math.max(0, Number(skip) || 0)
     });
 
+    // NEW: hide unreleased movies (per-list OR global setting)
+    // Trakt list item for movies includes movie.released (ISO date) with extended=full [Trakt API]
+    let settings = {};
+    try { settings = await getUserSettings(repo, userId); } catch {}
+    const hideUnreleased = !!(l.hideUnreleased) || !!(settings && settings.hideUnreleasedAll);
+    const now = Date.now();
+    const filteredItems = hideUnreleased
+      ? items.filter(it => {
+          if (it.type !== 'movie') return true;           // only filter movies
+          const relISO = it.movie && it.movie.released ? String(it.movie.released) : '';
+          const relMs = Date.parse(relISO);
+          // Keep if release date missing/invalid (be permissive) or already released
+          return !Number.isFinite(relMs) || relMs <= now;
+        })
+      : items;
+
     const metas = [];
-    for (const it of items){
+    for (const it of filteredItems){
       const core = it[it.type];
       const imdb = core?.ids?.imdb;
       if (!imdb || !/^tt\d+$/i.test(imdb)) continue;
@@ -220,7 +232,7 @@ async function getCatalog({ userId, type, catalogId, skip = 0, extras = {} }){
 
       metas.push({
         id: imdb,
-        type: it.type === 'show' ? 'series' : 'movie', // meta type stays standard [12]
+        type: it.type === 'show' ? 'series' : 'movie',
         name,
         description: overview,
         imdbRating: ratingNum,

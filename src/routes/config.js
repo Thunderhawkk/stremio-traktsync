@@ -15,27 +15,29 @@ const router = express.Router();
 router.use(authRequired);
 
 // For validate-list/preview-list only
-const urlOrSlug = z.string().min(3); // independent from save schema [12]
+const urlOrSlug = z.string().min(3);
 
-// Coercive list item schema: trim strings, coerce booleans/numbers, lowercase type. [1][12]
-const typeCoerce = z.preprocess(v => String(v ?? '').toLowerCase(), z.enum(['movie', 'series'])); // movie|series [12]
+// Coercive list item schema
+const typeCoerce = z.preprocess(v => String(v ?? '').toLowerCase(), z.enum(['movie', 'series']));
 const listItemLoose = z.object({
-  id: z.preprocess(v => (v == null || v === '') ? undefined : String(v), z.string().optional()), // normalize to UUID later [12]
-  name: z.string().trim().min(1),                 // trim + min chaining on ZodString [1][12]
-  url: z.string().trim().optional().default(''),  // allow drafts (empty) and trim [12]
-  type: typeCoerce,                                // "Movie"/"Series" -> movie/series [12]
+  id: z.preprocess(v => (v == null || v === '') ? undefined : String(v), z.string().optional()),
+  name: z.string().trim().min(1),
+  url: z.string().trim().optional().default(''),
+  type: typeCoerce,
   sortBy: z.string().trim().optional(),
   sortOrder: z.string().trim().optional(),
-  enabled: z.coerce.boolean().optional(),          // "true"/"false" -> boolean [12]
-  order: z.coerce.number().int().optional()        // "0","1" -> number [12]
+  enabled: z.coerce.boolean().optional(),
+  order: z.coerce.number().int().optional(),
+  hideUnreleased: z.coerce.boolean().optional() // NEW
 });
 
-// Save payload: lists/settings both optional so client can save either. [12]
+// Save payload: lists/settings both optional
 const saveSchema = z.object({
   body: z.object({
     lists: z.array(listItemLoose).optional(),
     catalogPrefix: z.string().optional(),
-    addonName: z.string().optional()
+    addonName: z.string().optional(),
+    hideUnreleasedAll: z.coerce.boolean().optional() // NEW
   })
 });
 
@@ -44,72 +46,75 @@ function clearUserCatalogCache(userId) {
   cache.keys().forEach(key => { if (key.startsWith(prefix)) cache.del(key); });
 }
 
-// GET /config — return lists + settings for UI. [11]
+// GET /config — return lists + settings
 router.get('/config', async (req, res) => {
-  const lists = await repo.getLists(req.user.id);
-  const settings = await getUserSettings(repo, req.user.id).catch(() => ({ addonName: 'Trakt Lists', catalogPrefix: '' }));
-  res.json({
-    lists,
-    catalogPrefix: settings.catalogPrefix || '',
-    addonName: settings.addonName || 'Trakt Lists'
-  });
-});
-
-// POST /config — single consolidated route to save lists and/or settings. [11]
-router.post('/config', validate(saveSchema), async (req, res) => {
-  try {
-    const { lists, catalogPrefix, addonName } = req.validated.body || {};
-
-    // 1) Save lists if provided
-    if (Array.isArray(lists)) {
-      // Use existing to compute stable order for new rows. [12]
-      const existing = await repo.getLists(req.user.id).catch(() => []);
-      const maxOrder = existing.reduce((m, r) => Number.isInteger(r.order) ? Math.max(m, r.order) : m, -1);
-      let nextOrder = maxOrder + 1;
-
-      // Normalize every row before persisting. [12]
-      const normalized = lists.map((l) => {
-        const uuidOk = z.string().uuid().safeParse(l.id).success; // runtime check, not schema gate [12]
-        return {
-          id: uuidOk ? l.id : uuidv4(),
-          name: (l.name || '').trim(),
-          url: typeof l.url === 'string' ? l.url.trim() : '',
-          type: l.type === 'series' ? 'series' : 'movie',
-          sortBy: l.sortBy || '',
-          sortOrder: l.sortOrder || '',
-          enabled: typeof l.enabled === 'boolean' ? l.enabled : true,
-          order: Number.isInteger(l.order) ? l.order : (nextOrder++)
-        };
-      });
-
-      // Reject truly invalid rows (missing essential fields) with a precise 400. [12]
-      const bad = normalized
-        .map((r, i) => ({ i, ok: r.name.length >= 1 && r.url.length >= 3 }))
-        .filter(x => !x.ok)
-        .map(x => x.i);
-      if (bad.length) {
-        return res.status(400).json({ ok: false, error: 'invalid_rows', rows: bad });
-      }
-
-      await repo.saveLists(req.user.id, normalized);
-      clearUserCatalogCache(req.user.id);
-    }
-
-    // 2) Save settings if provided
-    if (typeof catalogPrefix === 'string' || typeof addonName === 'string') {
-      await updateUserSettings(repo, req.user.id, { catalogPrefix, addonName });
-    }
-
-    // 3) Always bump so Stremio refetches the manifest. [12]
-    await bumpManifestVersion(req.user.id);
-
-    return res.json({ ok: true });
-  } catch (e) {
-    return res.status(500).json({ ok: false, error: 'save_failed' });
+  try{
+    const lists = await repo.getLists(req.user.id);
+    const settings = await getUserSettings(repo, req.user.id).catch(() => ({}));
+    res.json({
+      lists,
+      catalogPrefix: settings.catalogPrefix || '',
+      addonName: settings.addonName || 'Trakt Lists',
+      hideUnreleasedAll: !!settings.hideUnreleasedAll // NEW
+    });
+  }catch(e){
+    res.status(500).json({ error: 'load_config_failed' });
   }
 });
 
-// Validate list (unchanged logic for quick checks). [12]
+// POST /config — save lists and/or settings
+router.post('/config', validate(saveSchema), async (req, res) => {
+  const { lists, catalogPrefix, addonName, hideUnreleasedAll } = req.validated.body || {};
+
+  // For cache invalidation on global toggle change
+  const before = await getUserSettings(repo, req.user.id).catch(() => ({}));
+  const beforeFlag = !!before.hideUnreleasedAll;
+
+  if (Array.isArray(lists)) {
+    const existing = await repo.getLists(req.user.id).catch(() => []);
+    const maxOrder = existing.reduce((m, r) => Number.isInteger(r.order) ? Math.max(m, r.order) : m, -1);
+    let nextOrder = maxOrder + 1;
+    const normalized = lists.map((l) => ({
+      id: (l.id && typeof l.id === 'string' && l.id) ? l.id : undefined,
+      name: (l.name || '').trim(),
+      url: typeof l.url === 'string' ? l.url.trim() : '',
+      type: l.type === 'series' ? 'series' : 'movie',
+      sortBy: l.sortBy || '',
+      sortOrder: l.sortOrder || '',
+      enabled: typeof l.enabled === 'boolean' ? l.enabled : true,
+      order: Number.isInteger(l.order) ? l.order : (nextOrder++),
+      hideUnreleased: !!l.hideUnreleased
+    }));
+    const bad = normalized
+      .map((r, i) => ({ i, ok: r.name.length >= 1 && r.url.length >= 3 }))
+      .filter(x => !x.ok).map(x => x.i);
+    if (bad.length) return res.status(400).json({ ok: false, error: 'invalid_rows', rows: bad });
+    await repo.saveLists(req.user.id, normalized);
+    clearUserCatalogCache(req.user.id); // lists changed
+  }
+
+  // Persist provided settings; ignore undefined keys
+  let changedGlobal = false;
+  if (
+    typeof catalogPrefix === 'string' ||
+    typeof addonName === 'string' ||
+    typeof hideUnreleasedAll === 'boolean'
+  ) {
+    await updateUserSettings(repo, req.user.id, { catalogPrefix, addonName, hideUnreleasedAll }); // NEW
+    if (typeof hideUnreleasedAll === 'boolean') {
+      changedGlobal = beforeFlag !== hideUnreleasedAll;
+    }
+  }
+
+  if (changedGlobal) {
+    clearUserCatalogCache(req.user.id); // global filter changed => purge caches
+  }
+
+  await bumpManifestVersion(req.user.id);
+  res.json({ ok: true });
+});
+
+// Validate list (quick checks)
 const validateSchema = z.object({ body: z.object({ url: urlOrSlug, type: z.enum(['movie','series']) }) });
 router.post('/validate-list', validate(validateSchema), async (req, res) => {
   const { url, type } = req.validated.body;
@@ -120,6 +125,25 @@ router.post('/validate-list', validate(validateSchema), async (req, res) => {
     return res.json({ ok: true, count: Array.isArray(items) ? items.length : 0 });
   } catch {
     return res.status(400).json({ ok: false, error: 'validation_failed' });
+  }
+});
+
+router.post('/validate-all', async (req, res) => {
+  try {
+    const lists = await repo.getLists(req.user.id);
+    const out = [];
+    for (const l of (lists || [])) {
+      try {
+        const r = await validateListExists(l.url || '');
+        out.push({ id: l.id, name: l.name, ok: !!r.ok });
+      } catch {
+        out.push({ id: l.id, name: l.name, ok: false });
+      }
+    }
+    const ok = out.filter(x => x.ok).length;
+    res.json({ total: out.length, ok, failed: out.length - ok, results: out });
+  } catch (e) {
+    res.status(500).json({ error: 'validate_all_failed' });
   }
 });
 
@@ -217,7 +241,7 @@ router.post('/preview-list', validate(previewSchema), async (req, res) => {
   }
 });
 
-// Delete list (unchanged)
+// Delete list
 router.delete('/config/:id', async (req, res) => {
   const lists = await repo.getLists(req.user.id);
   const next = lists.filter(l => l.id !== req.params.id);

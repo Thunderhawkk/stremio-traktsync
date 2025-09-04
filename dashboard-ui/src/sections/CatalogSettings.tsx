@@ -3,11 +3,13 @@ import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import { Switch } from "../components/ui/switch";
 
 export default function CatalogSettings(){
   const [saving, setSaving] = useState(false);
   const [prefix, setPrefix] = useState("");
   const [name, setName] = useState("Trakt Lists");
+  const [hideAll, setHideAll] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -18,6 +20,7 @@ export default function CatalogSettings(){
           const cfg = await r.json();
           setPrefix(cfg?.catalogPrefix || "");
           setName(cfg?.addonName || "Trakt Lists");
+          setHideAll(!!cfg?.hideUnreleasedAll);
           setLoaded(true);
         }
       }catch{}
@@ -27,12 +30,16 @@ export default function CatalogSettings(){
   async function save(){
     setSaving(true);
     try{
-      await fetch(`/api/config`, {
+      const res = await fetch(`/api/config`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ catalogPrefix: prefix, addonName: name })
+        body: JSON.stringify({ catalogPrefix: prefix, addonName: name, hideUnreleasedAll: hideAll })
       });
+      if (res.ok) {
+        // Broadcast so ListsPanel updates immediately without a page refresh
+        window.dispatchEvent(new CustomEvent("config:updated", { detail: { hideUnreleasedAll: hideAll } }));
+      }
     } finally { setSaving(false); }
   }
 
@@ -59,6 +66,12 @@ export default function CatalogSettings(){
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
             placeholder="e.g. Trakt Lists"
           />
+        </div>
+        <div className="col-span-12 md:col-span-6">
+          <label className="block text-xs text-muted mb-1">Hide unreleased movies (all lists)</label>
+          <div className="h-10 flex items-center">
+            <Switch checked={hideAll} onCheckedChange={setHideAll} />
+          </div>
         </div>
         <div className="col-span-12 pt-1">
           <Button onClick={save} disabled={saving}>Save</Button>
