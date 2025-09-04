@@ -10,6 +10,7 @@ const cfg = require('../config');
 const { validateListExists, getUserListItems } = require('../services/traktService');
 const { cache } = require('../utils/cache');
 const { getUserSettings, updateUserSettings } = require('../state/userSettings');
+const { GENRES } = require('../constants/genres');
 
 const router = express.Router();
 router.use(authRequired);
@@ -17,7 +18,7 @@ router.use(authRequired);
 // For validate-list/preview-list only
 const urlOrSlug = z.string().min(3);
 
-// Coercive list item schema
+// Coercive list item schema (includes filters)
 const typeCoerce = z.preprocess(v => String(v ?? '').toLowerCase(), z.enum(['movie', 'series']));
 const listItemLoose = z.object({
   id: z.preprocess(v => (v == null || v === '') ? undefined : String(v), z.string().optional()),
@@ -26,6 +27,11 @@ const listItemLoose = z.object({
   type: typeCoerce,
   sortBy: z.string().trim().optional(),
   sortOrder: z.string().trim().optional(),
+  genre: z.string().trim().optional(),       // NEW
+  yearMin: z.string().trim().optional(),     // NEW
+  yearMax: z.string().trim().optional(),     // NEW
+  ratingMin: z.string().trim().optional(),   // NEW
+  ratingMax: z.string().trim().optional(),   // NEW
   enabled: z.coerce.boolean().optional(),
   order: z.coerce.number().int().optional(),
   hideUnreleased: z.coerce.boolean().optional() // NEW
@@ -46,6 +52,11 @@ function clearUserCatalogCache(userId) {
   cache.keys().forEach(key => { if (key.startsWith(prefix)) cache.del(key); });
 }
 
+// Genres helper (for UI display, sourced from manifest’s canonical list)
+router.get('/genres', async (_req, res) => {
+  res.json({ genres: Array.isArray(GENRES) ? GENRES : [] });
+});
+
 // GET /config — return lists + settings
 router.get('/config', async (req, res) => {
   try{
@@ -55,7 +66,7 @@ router.get('/config', async (req, res) => {
       lists,
       catalogPrefix: settings.catalogPrefix || '',
       addonName: settings.addonName || 'Trakt Lists',
-      hideUnreleasedAll: !!settings.hideUnreleasedAll // NEW
+      hideUnreleasedAll: !!settings.hideUnreleasedAll
     });
   }catch(e){
     res.status(500).json({ error: 'load_config_failed' });
@@ -81,6 +92,11 @@ router.post('/config', validate(saveSchema), async (req, res) => {
       type: l.type === 'series' ? 'series' : 'movie',
       sortBy: l.sortBy || '',
       sortOrder: l.sortOrder || '',
+      genre: l.genre || '',             // NEW persisted
+      yearMin: l.yearMin || '',         // NEW persisted
+      yearMax: l.yearMax || '',         // NEW persisted
+      ratingMin: l.ratingMin || '',     // NEW persisted
+      ratingMax: l.ratingMax || '',     // NEW persisted
       enabled: typeof l.enabled === 'boolean' ? l.enabled : true,
       order: Number.isInteger(l.order) ? l.order : (nextOrder++),
       hideUnreleased: !!l.hideUnreleased
@@ -187,7 +203,10 @@ function mapGenre(input) {
   if (l.includes('thriller')) return 'Thriller';
   if (l.includes('war')) return 'War';
   if (l.includes('western')) return 'Western';
-  return s.split(' ').map(w => w ? w.toUpperCase() + w.slice(1).toLowerCase() : w).join(' ');
+  return s.split(' ').map(w => w
+    ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+    : w
+  ).join(' ');
 }
 
 function applyPreviewFilters(items, extras = {}) {

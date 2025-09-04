@@ -61,6 +61,7 @@ export default function ListsPanel() {
   const [lists, setLists] = useState<ListItem[]>([]);
   const [busy, setBusy] = useState(false);
   const [hideAll, setHideAll] = useState(false); // global override
+  const [supportedGenres, setSupportedGenres] = useState<string[]>([]); // helper display
 
   // Small drag threshold to avoid accidental drags on click
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
@@ -68,10 +69,17 @@ export default function ListsPanel() {
   async function load() {
     setBusy(true);
     try {
-      const r = await fetch(`/api/config?ts=${Date.now()}`, { credentials: "include", cache: "no-store" });
-      const data = r.ok ? await r.json() : { lists: [] };
+      const [cfgR, gR] = await Promise.all([
+        fetch(`/api/config?ts=${Date.now()}`, { credentials: "include", cache: "no-store" }),
+        fetch(`/api/genres?ts=${Date.now()}`, { credentials: "include", cache: "no-store" })
+      ]);
+      const data = cfgR.ok ? await cfgR.json() : { lists: [] };
       setLists((data.lists as ListItem[]) || []);
       setHideAll(!!data.hideUnreleasedAll);
+      if (gR.ok) {
+        const gj = await gR.json().catch(() => null);
+        if (gj && Array.isArray(gj.genres)) setSupportedGenres(gj.genres);
+      }
     } finally {
       setBusy(false);
     }
@@ -100,7 +108,7 @@ export default function ListsPanel() {
   }
 
   async function save() {
-    const body = { lists: lists.map((x, i) => ({ ...x, order: i })) }; // hideUnreleased persists as-is
+    const body = { lists: lists.map((x, i) => ({ ...x, order: i })) }; // includes genre/ranges
     await fetch(`/api/config`, { method:"POST", credentials:"include", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body) });
   }
 
@@ -139,7 +147,6 @@ export default function ListsPanel() {
     const r = await fetch(`/api/validate-all`, { method:"POST", credentials:"include" });
     const j = await r.json().catch(() => null);
     if (!r.ok || !j) return;
-    // Optionally show a toast/banner with j.ok / j.failed summary
   }
 
   async function preview(it: ListItem) {
@@ -189,6 +196,13 @@ export default function ListsPanel() {
 
   return (
     <div className="space-y-3">
+      {/* Supported genres helper */}
+      {supportedGenres.length > 0 && (
+        <div className="text-sm text-white/70">
+          Supported genres: {supportedGenres.join(", ")}
+        </div>
+      )}
+
       {/* Header actions */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Manage Trakt lists that power the addon.</h2>

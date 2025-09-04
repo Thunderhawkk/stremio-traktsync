@@ -12,12 +12,17 @@
       "type": "movie",
       "sortBy": "",
       "sortOrder": "",
+      "genre": "",
+      "yearMin": "",
+      "yearMax": "",
+      "ratingMin": "",
+      "ratingMax": "",
       "enabled": true,
       "order": 0,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-04T00:44:51.309Z",
-      "updatedAt": "2025-09-04T00:44:51.309Z"
+      "createdAt": "2025-09-04T02:07:26.518Z",
+      "updatedAt": "2025-09-04T02:07:26.518Z"
     },
     {
       "id": "bebdd2b2-f7f0-4603-a1e1-83db8f8c0b65",
@@ -26,12 +31,17 @@
       "type": "movie",
       "sortBy": "year",
       "sortOrder": "",
+      "genre": "Comedy + Horror",
+      "yearMin": "",
+      "yearMax": "",
+      "ratingMin": "",
+      "ratingMax": "",
       "enabled": true,
       "order": 1,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-04T00:44:51.309Z",
-      "updatedAt": "2025-09-04T00:44:51.309Z"
+      "createdAt": "2025-09-04T02:07:26.518Z",
+      "updatedAt": "2025-09-04T02:07:26.518Z"
     },
     {
       "id": "c62c64a2-1ead-4c5b-9886-5ec9a0a597ed",
@@ -40,12 +50,17 @@
       "type": "movie",
       "sortBy": "year",
       "sortOrder": "",
+      "genre": "",
+      "yearMin": "",
+      "yearMax": "",
+      "ratingMin": "",
+      "ratingMax": "",
       "enabled": true,
       "order": 2,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-04T00:44:51.309Z",
-      "updatedAt": "2025-09-04T00:44:51.309Z"
+      "createdAt": "2025-09-04T02:07:26.518Z",
+      "updatedAt": "2025-09-04T02:07:26.518Z"
     }
   ],
   "addonToken": "95de27d20f3805195e81e0b9daa349a2",
@@ -54,5 +69,5 @@
     "refresh_token": "c8b96e515d8fc815f0b02cbffd107211ca62df5de022ffdc02f30930472dcacb",
     "expires_at": "2025-09-04T23:07:24.590Z"
   },
-  "hideUnreleasedAll": false
+  "hideUnreleasedAll": true
 }
