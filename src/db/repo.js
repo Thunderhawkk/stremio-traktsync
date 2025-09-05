@@ -141,17 +141,17 @@ async function initDb() {
 
 const repo = {
   // Users
-  async createUser({ username, email, passwordHash, role = 'user' }) {
+  async createUser({ username, email, passwordHash, role = 'user', provider = 'local', provider_id = null, avatar_url = null, email_verified = false }) {
     if (usePg) {
       const pg = await getPg();
       const id = uuidv4();
       const ts = new Date();
       await pg.query(
-        `INSERT INTO users(id, username, email, password_hash, role, created_at, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-        [id, username, email || null, passwordHash, role, ts, ts]
+        `INSERT INTO users(id, username, email, password_hash, role, provider, provider_id, avatar_url, email_verified, created_at, updated_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+        [id, username, email || null, passwordHash || null, role, provider, provider_id, avatar_url, email_verified, ts, ts]
       );
-      return { id, username, email, role, createdAt: ts, updatedAt: ts };
+      return { id, username, email, role, provider, provider_id, avatar_url, email_verified, createdAt: ts, updatedAt: ts };
     } else {
       const users = fsdb.read('users');
       if (users.find(u => u.username === username)) throw new Error('username_taken');
@@ -159,8 +159,12 @@ const repo = {
         id: uuidv4(),
         username,
         email: email || null,
-        passwordHash,
+        passwordHash: passwordHash || null,
         role,
+        provider,
+        provider_id,
+        avatar_url,
+        email_verified,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -188,6 +192,70 @@ const repo = {
       return rows && rows[0] ? rows[0] : null;
     } else {
       return fsdb.read('users').find(u => u.id === id) || null;
+    }
+  },
+
+  async findUserByEmail(email) {
+    if (usePg) {
+      const pg = await getPg();
+      const { rows } = await pg.query(`SELECT * FROM users WHERE email=$1`, [email]);
+      return rows && rows[0] ? rows[0] : null;
+    } else {
+      const users = fsdb.read('users');
+      return users.find(u => u.email === email) || null;
+    }
+  },
+
+  async findUserByProvider(provider, providerId) {
+    if (usePg) {
+      const pg = await getPg();
+      const { rows } = await pg.query(
+        `SELECT * FROM users WHERE provider=$1 AND provider_id=$2`,
+        [provider, providerId]
+      );
+      return rows && rows[0] ? rows[0] : null;
+    } else {
+      const users = fsdb.read('users');
+      return users.find(u => u.provider === provider && u.provider_id === providerId) || null;
+    }
+  },
+
+  async updateUser(id, updates) {
+    const ts = new Date();
+    if (usePg) {
+      const pg = await getPg();
+      const updateFields = [];
+      const values = [];
+      let paramIndex = 1;
+      
+      Object.keys(updates).forEach(key => {
+        if (updates[key] !== undefined) {
+          updateFields.push(`${key}=$${paramIndex}`);
+          values.push(updates[key]);
+          paramIndex++;
+        }
+      });
+      
+      if (updateFields.length === 0) return null;
+      
+      updateFields.push(`updated_at=$${paramIndex}`);
+      values.push(ts);
+      values.push(id);
+      
+      const { rows } = await pg.query(
+        `UPDATE users SET ${updateFields.join(', ')} WHERE id=$${paramIndex + 1} RETURNING *`,
+        values
+      );
+      return rows && rows[0] ? rows[0] : null;
+    } else {
+      const users = fsdb.read('users');
+      const user = users.find(u => u.id === id);
+      if (user) {
+        Object.assign(user, updates, { updatedAt: ts.toISOString() });
+        fsdb.write('users', users);
+        return user;
+      }
+      return null;
     }
   },
 
@@ -341,29 +409,9 @@ const repo = {
 
   async saveLists(userId, lists) {
     if (usePg) {
-      const pg = await getPg();
-      await pg.query('BEGIN');
-      await pg.query(`DELETE FROM list_config WHERE user_id=$1`, [userId]);
-      for (const l of lists) {
-        await pg.query(
-          `
-          INSERT INTO list_config(id, user_id, name, url, type, sort_by, sort_order, enabled, "order", created_at, updated_at)
-          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW(),NOW())
-          `,
-          [
-            l.id,
-            userId,
-            l.name,
-            l.url,
-            l.type,
-            l.sortBy || null,
-            l.sortOrder || null,
-            !!l.enabled,
-            l.order || null
-          ]
-        );
-      }
-      await pg.query('COMMIT');
+      // Use optimized batch insert
+      const optimizedQueries = require('./optimizedQueries');
+      await optimizedQueries.batchInsertListConfigs(userId, lists);
     } else {
       const doc = await readUserDoc(userId);
       const now = new Date().toISOString();
@@ -519,5 +567,7 @@ module.exports = {
   getLastAutoRefreshAt: repo.getLastAutoRefreshAt.bind(repo),
   setLastAutoRefreshAt: repo.setLastAutoRefreshAt.bind(repo),
   getLastManualRefreshAt: repo.getLastManualRefreshAt.bind(repo),
-  setLastManualRefreshAt: repo.setLastManualRefreshAt.bind(repo)
+  setLastManualRefreshAt: repo.setLastManualRefreshAt.bind(repo),
+  // optimized queries
+  optimized: require('./optimizedQueries')
 };

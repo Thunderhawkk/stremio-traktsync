@@ -3,11 +3,11 @@
     "id": "04273438-2d6f-43c0-87c6-1848800f544b",
     "username": "Yash",
     "email": null,
-    "passwordHash": "$2b$11$R3El7s..82NPMmTDrgkv3u2br3cbIHINYiqAc.MfBmOw4N6VUwbiG",
+    "passwordHash": "$argon2id$v=19$m=65536,t=2,p=1$M3UG9iIv03PcrfpEi3l/zg$HJncVFOHOZkbpqjgy0JFxnLCWR9WaYklTN5iKXBGmJo",
     "role": "admin",
     "createdAt": "2025-08-26T14:52:37.871Z",
-    "updatedAt": "2025-08-26T14:52:37.871Z",
-    "lastLoginAt": "2025-09-05T01:10:25.158Z",
+    "updatedAt": "2025-09-05T02:01:35.933Z",
+    "lastLoginAt": "2025-09-05T05:22:04.702Z",
     "addonToken": "d361fa0d48b7ab632eeaea7b292b6154"
   },
   {

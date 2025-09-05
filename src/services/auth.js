@@ -40,9 +40,9 @@ async function verifyAndMaybeMigrate({ user, plain }){
   return false;
 }
 
-async function createUser({ username, email, password, role='user' }){
-  const passwordHash = await hashPassword(password);
-  return repo.createUser({ username, email, passwordHash, role });
+async function createUser({ username, email, password, role='user', provider='local', provider_id=null, avatar_url=null, email_verified=false }){
+  const passwordHash = password ? await hashPassword(password) : null;
+  return repo.createUser({ username, email, passwordHash, role, provider, provider_id, avatar_url, email_verified });
 }
 
 async function login({ username, password }){

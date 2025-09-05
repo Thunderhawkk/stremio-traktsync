@@ -21,8 +21,8 @@
       "order": 0,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-05T01:10:33.310Z",
-      "updatedAt": "2025-09-05T01:10:33.310Z"
+      "createdAt": "2025-09-05T05:22:11.089Z",
+      "updatedAt": "2025-09-05T05:22:11.089Z"
     },
     {
       "id": "bebdd2b2-f7f0-4603-a1e1-83db8f8c0b65",
@@ -31,7 +31,7 @@
       "type": "movie",
       "sortBy": "year",
       "sortOrder": "",
-      "genre": "Comedy + Fantasy + Horror",
+      "genre": "",
       "yearMin": "",
       "yearMax": "",
       "ratingMin": "",
@@ -40,8 +40,8 @@
       "order": 1,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-05T01:10:33.310Z",
-      "updatedAt": "2025-09-05T01:10:33.310Z"
+      "createdAt": "2025-09-05T05:22:11.089Z",
+      "updatedAt": "2025-09-05T05:22:11.089Z"
     },
     {
       "id": "c62c64a2-1ead-4c5b-9886-5ec9a0a597ed",
@@ -59,8 +59,8 @@
       "order": 2,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-05T01:10:33.310Z",
-      "updatedAt": "2025-09-05T01:10:33.310Z"
+      "createdAt": "2025-09-05T05:22:11.089Z",
+      "updatedAt": "2025-09-05T05:22:11.089Z"
     }
   ],
   "addonToken": "95de27d20f3805195e81e0b9daa349a2",
@@ -69,5 +69,6 @@
     "refresh_token": "8ed8bd8f63d39c56f7e1938433de1c02d71cdc2f25af4ca1e607c9ce283b95ca",
     "expires_at": "2025-09-05T23:59:44.000Z"
   },
-  "hideUnreleasedAll": true
+  "hideUnreleasedAll": true,
+  "lastDeltaAt": "2025-09-05T03:02:55.725Z"
 }

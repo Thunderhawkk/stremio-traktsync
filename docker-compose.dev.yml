@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "${PORT:-8084}:8084"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:password@db:5432/stremio_trakt
+      - JWT_SECRET=dev-jwt-secret-change-me
+      - JWT_REFRESH_SECRET=dev-refresh-secret-change-me
+      - SESSION_SECRET=dev-session-secret-change-me
+      - BASE_URL=http://localhost:8084
+      - COOKIE_SECURE=false
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dashboard-ui/node_modules
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: stremio_trakt
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+
+volumes:
+  postgres_dev_data:

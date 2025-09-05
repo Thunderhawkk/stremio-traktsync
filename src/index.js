@@ -8,13 +8,16 @@ const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const path = require('path');
+const passport = require('./config/oauth2');
 const scheduler = require('./jobs/scheduler');
+const databaseMonitor = require('./services/databaseMonitor');
 
 const { logger } = require('./utils/logger');
 const { initDb } = require('./db/repo');
 
 const pages         = require('./routes/pages');
 const authRoutes    = require('./routes/auth');
+const oauth2Routes  = require('./routes/oauth2');
 const configRoutes  = require('./routes/config');
 const traktRoutes   = require('./routes/trakt');
 const addonRoutes   = require('./routes/addon');
@@ -80,6 +83,8 @@ app.use(session({
 
 app.use(attachSessionUser);
 app.use(absoluteSessionTimeout({ absoluteMs: ABS_MIN * 60 * 1000 }));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(limiterApp);
 
 // Legacy static assets used by server-rendered pages
@@ -122,6 +127,7 @@ app.use(pages);
 
 // Auth API
 app.use('/api/auth', limiterAuthStrict, authRoutes);
+app.use('/auth', oauth2Routes);
 
 // Debug + config
 app.use('/api', debugRoutes);
@@ -148,6 +154,7 @@ app.use(require('./middleware/error').errorHandler);
 (async () => {
   await initDb();
   scheduler.start(); // <-- start token refresh + prewarm loops
+  databaseMonitor.start(); // <-- start database monitoring
   const port = process.env.PORT || 8080;
   app.listen(port, () => logger.info({ port, env: process.env.NODE_ENV || 'development' }, 'server_started'));
 })();

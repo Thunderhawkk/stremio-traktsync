@@ -7,56 +7,104 @@
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
   </head>
 
-  <body class="min-h-screen text-slate-100 bg-[#0b0f17] [background-image:radial-gradient(1200px_800px_at_10%_-10%,rgba(106,165,255,.28),transparent_60%),radial-gradient(1200px_800px_at_110%_10%,rgba(192,132,252,.28),transparent_60%)] selection:bg-[#6aa5ff]/30 selection:text-white">
+  <body class="min-h-screen text-slate-100 bg-[#0b0f17] [background-image:radial-gradient(1200px_800px_at_10%_-10%,rgba(106,165,255,.28),transparent_60%),radial-gradient(1200px_800px_at_110%_10%,rgba(192,132,252,.28),transparent_60%)] selection:bg-[#6aa5ff]/30 selection:text-white transition-all duration-500 ease-in-out" data-theme="dark">
 
-    <!-- Navbar -->
-    <header class="sticky top-0 z-40 border-b border-white/10 bg-[#0b0f17]/70 backdrop-blur">
-      <div class="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-[#c084fc] to-[#6aa5ff] shadow-[0_10px_30px_rgba(0,0,0,.45)] animate-[float_7s_ease-in-out_infinite]"></div>
-          <span class="text-sm tracking-widest uppercase text-white/70">TraktSync</span>
+    <!-- Accessibility improvements and ARIA labels -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-white px-4 py-2 rounded-lg z-50">Skip to main content</a>
+
+    <!-- Enhanced Theme Toggle Button with better animations and accessibility -->
+    <button id="theme-toggle" class="fixed top-4 left-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md transition-all duration-300 group hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30" aria-label="Toggle theme">
+      <svg class="w-5 h-5 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path id="theme-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+      </svg>
+    </button>
+
+    <!-- Enhanced Navbar with better mobile and theme support -->
+    <header class="sticky top-0 z-40 border-b border-white/10 bg-[#0b0f17]/80 backdrop-blur-xl transition-all duration-500 supports-[backdrop-filter]:bg-[#0b0f17]/60">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 py-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-[#c084fc] to-[#6aa5ff] shadow-[0_10px_30px_rgba(0,0,0,.45)] animate-[float_7s_ease-in-out_infinite] relative overflow-hidden hover:shadow-[0_15px_40px_rgba(106,165,255,.3)] transition-all duration-300">
+              <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+              <div class="absolute inset-0 opacity-0 hover:opacity-100 bg-gradient-to-br from-white/10 to-transparent transition-opacity duration-300"></div>
+            </div>
+            <span class="text-sm tracking-widest uppercase text-white/70 font-medium hover:text-white/90 transition-colors duration-300">TraktSync</span>
+          </div>
+          
+          <!-- Enhanced Mobile menu button -->
+          <button id="mobile-menu-btn" class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 border border-white/10 hover:bg-white/15 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 active:scale-95">
+            <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+          
+          <!-- Enhanced Desktop navigation -->
+          <nav class="hidden md:flex items-center gap-6 text-sm text-white/70">
+            <a href="#features" class="hover:text-white transition-all duration-300 hover:scale-105 transform relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-[#6aa5ff] after:to-[#c084fc] after:transition-all after:duration-300 hover:after:w-full">Features</a>
+            <a href="#how" class="hover:text-white transition-all duration-300 hover:scale-105 transform relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-[#6aa5ff] after:to-[#c084fc] after:transition-all after:duration-300 hover:after:w-full">How it works</a>
+            <a href="#faq" class="hover:text-white transition-all duration-300 hover:scale-105 transform relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-[#6aa5ff] after:to-[#c084fc] after:transition-all after:duration-300 hover:after:w-full">FAQ</a>
+          </nav>
+          
+          <!-- Enhanced Desktop buttons -->
+          <div class="hidden md:flex items-center gap-2">
+            <a href="/dashboard" class="relative overflow-hidden rounded-lg px-3.5 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 border border-white/10 transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white/30 group">
+              <span class="pointer-events-none absolute -left-1/2 -top-full h-[300%] w-1/2 rotate-25 bg-gradient-to-r from-transparent via-white/35 to-transparent animate-[shine_2.8s_linear_infinite] group-hover:animate-[shine_1.4s_linear_infinite]"></span>
+              <span class="relative z-10">Open Dashboard</span>
+            </a>
+            <a href="/login" class="rounded-lg px-3.5 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 border border-white/10 transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white/30">
+              Login
+            </a>
+            <a href="/register" class="relative overflow-hidden rounded-lg px-3.5 py-2 text-sm font-semibold bg-[#6aa5ff] hover:bg-[#5b8ef0] shadow-[0_10px_30px_rgba(0,0,0,.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_15px_40px_rgba(106,165,255,.4)] focus:outline-none focus:ring-2 focus:ring-[#6aa5ff]/50 group">
+              <span class="pointer-events-none absolute -left-1/2 -top-full h-[300%] w-1/2 rotate-25 bg-gradient-to-r from-transparent via-white/35 to-transparent animate-[shine_2.8s_linear_infinite] group-hover:animate-[shine_1.4s_linear_infinite]"></span>
+              <span class="relative z-10">Register</span>
+            </a>
+          </div>
         </div>
-        <nav class="hidden md:flex items-center gap-6 text-sm text-white/70">
-          <a href="#features" class="hover:text-white transition-colors">Features</a>
-          <a href="#how" class="hover:text-white transition-colors">How it works</a>
-          <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
-        </nav>
-        <div class="flex items-center gap-2">
-          <a href="/dashboard" class="relative overflow-hidden rounded-lg px-3.5 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 border border-white/10">
-            <span class="pointer-events-none absolute -left-1/2 -top-full h-[300%] w-1/2 rotate-25 bg-gradient-to-r from-transparent via-white/35 to-transparent animate-[shine_2.8s_linear_infinite]"></span>
-            Open Dashboard
-          </a>
-          <a href="/login" class="rounded-lg px-3.5 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 border border-white/10">
-            Login
-          </a>
-          <a href="/register" class="relative overflow-hidden rounded-lg px-3.5 py-2 text-sm font-semibold bg-[#6aa5ff] hover:bg-[#5b8ef0] shadow-[0_10px_30px_rgba(0,0,0,.45)]">
-            <span class="pointer-events-none absolute -left-1/2 -top-full h-[300%] w-1/2 rotate-25 bg-gradient-to-r from-transparent via-white/35 to-transparent animate-[shine_2.8s_linear_infinite]"></span>
-            Register
-          </a>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden mt-4 pb-4 border-t border-white/10 hidden">
+          <nav class="flex flex-col gap-4 pt-4">
+            <a href="#features" class="text-white/70 hover:text-white transition-colors">Features</a>
+            <a href="#how" class="text-white/70 hover:text-white transition-colors">How it works</a>
+            <a href="#faq" class="text-white/70 hover:text-white transition-colors">FAQ</a>
+            <div class="flex flex-col gap-2 pt-2">
+              <a href="/dashboard" class="relative overflow-hidden rounded-lg px-4 py-3 text-sm font-medium bg-white/10 hover:bg-white/15 border border-white/10 text-center">
+                <span class="pointer-events-none absolute -left-1/2 -top-full h-[300%] w-1/2 rotate-25 bg-gradient-to-r from-transparent via-white/35 to-transparent animate-[shine_2.8s_linear_infinite]"></span>
+                Open Dashboard
+              </a>
+              <a href="/login" class="rounded-lg px-4 py-3 text-sm font-medium bg-white/10 hover:bg-white/15 border border-white/10 text-center">
+                Login
+              </a>
+              <a href="/register" class="relative overflow-hidden rounded-lg px-4 py-3 text-sm font-semibold bg-[#6aa5ff] hover:bg-[#5b8ef0] shadow-[0_10px_30px_rgba(0,0,0,.45)] text-center">
+                <span class="pointer-events-none absolute -left-1/2 -top-full h-[300%] w-1/2 rotate-25 bg-gradient-to-r from-transparent via-white/35 to-transparent animate-[shine_2.8s_linear_infinite]"></span>
+                Register
+              </a>
+            </div>
+          </nav>
         </div>
       </div>
     </header>
 
     <!-- Hero -->
     <section class="relative overflow-hidden">
-      <div class="mx-auto max-w-7xl px-6 pt-14 pb-16 md:pt-20 md:pb-24 grid md:grid-cols-2 gap-10">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 pt-10 pb-12 md:pt-20 md:pb-24 grid md:grid-cols-2 gap-8 lg:gap-10">
         <div data-aos="fade-up">
-          <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight">
             Personal Trakt lists, organized as <span class="bg-gradient-to-r from-[#c084fc] via-[#6aa5ff] to-[#22d3ee] bg-clip-text text-transparent">Stremio</span> catalogs.
           </h1>
-          <p class="mt-5 text-white/70 max-w-2xl">
+          <p class="mt-4 sm:mt-5 text-white/70 max-w-2xl text-sm sm:text-base">
             Import Trakt lists, group them in Stremio’s Catalog section with a custom label, and browse fast with pagination, filters, and private access. 
           </p>
-          <div class="mt-7 flex flex-wrap gap-3">
-            <a href="/dashboard" class="relative overflow-hidden rounded-lg px-5 py-3 font-semibold bg-[#6aa5ff] hover:bg-[#5b8ef0] shadow-[0_10px_30px_rgba(0,0,0,.45)]">
+          <div class="mt-6 sm:mt-7 flex flex-col sm:flex-row gap-3">
+            <a href="/dashboard" class="relative overflow-hidden rounded-lg px-6 py-4 font-semibold bg-[#6aa5ff] hover:bg-[#5b8ef0] shadow-[0_10px_30px_rgba(0,0,0,.45)] text-center sm:text-left">
               <span class="pointer-events-none absolute -left-1/2 -top-full h-[300%] w-1/2 rotate-25 bg-gradient-to-r from-transparent via-white/35 to-transparent animate-[shine_2.8s_linear_infinite]"></span>
               Open dashboard
             </a>
-            <a href="/register" class="rounded-lg px-5 py-3 font-semibold bg-white/10 hover:bg-white/15 border border-white/10">
+            <a href="/register" class="rounded-lg px-6 py-4 font-semibold bg-white/10 hover:bg-white/15 border border-white/10 text-center sm:text-left">
               Register
             </a>
           </div>
-          <div class="mt-6 flex items-center gap-4 text-xs text-white/50">
+          <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-white/50">
             <span class="inline-flex items-center gap-1.5">
               <span class="size-2 rounded-full bg-emerald-400 animate-[pulseSoft_2.8s_ease-in-out_infinite]"></span>
               Offline‑safe manifest fetch
@@ -86,10 +134,10 @@
     </section>
 
     <!-- Features -->
-    <section id="features" class="py-16 md:py-24">
-      <div class="mx-auto max-w-7xl px-6">
-        <h2 class="text-2xl md:text-3xl font-bold mb-10" data-aos="fade-up">Features built for power‑users</h2>
-        <div class="grid md:grid-cols-3 gap-6">
+    <section id="features" class="py-12 sm:py-16 md:py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6">
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-8 sm:mb-10 text-center md:text-left" data-aos="fade-up">Features built for power‑users</h2>
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           <div class="rounded-xl p-6 border border-white/10 bg-white/5 backdrop-blur" data-aos="fade-up">
             <div class="text-[#6aa5ff] mb-3">🔄</div>
             <h3 class="font-semibold mb-2">Two‑way sync</h3>
@@ -131,10 +179,10 @@
     </section>
 
     <!-- How it works -->
-    <section id="how" class="py-16 md:py-24">
-      <div class="mx-auto max-w-7xl px-6">
-        <h2 class="text-2xl md:text-3xl font-bold mb-10" data-aos="fade-up">How it works</h2>
-        <div class="grid md:grid-cols-3 gap-6">
+    <section id="how" class="py-12 sm:py-16 md:py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6">
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-8 sm:mb-10 text-center md:text-left" data-aos="fade-up">How it works</h2>
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           <div class="rounded-xl p-6 border border-white/10 bg-white/5 backdrop-blur" data-aos="fade-up">
             <div class="text-white/80 text-sm">Connect Trakt</div>
             <h3 class="font-semibold mt-1 mb-2">Authorize in the dashboard</h3>
@@ -155,18 +203,18 @@
     </section>
 
     <!-- Final CTA -->
-    <section id="install" class="py-16 md:py-24">
-      <div class="mx-auto max-w-5xl px-6 text-center">
-        <h2 class="text-2xl md:text-3xl font-bold mb-4" data-aos="fade-up">Ready to browse personal catalogs?</h2>
-        <p class="text-white/70 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="50">
+    <section id="install" class="py-12 sm:py-16 md:py-24">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6 text-center">
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-4" data-aos="fade-up">Ready to browse personal catalogs?</h2>
+        <p class="text-white/70 max-w-2xl mx-auto text-sm sm:text-base" data-aos="fade-up" data-aos-delay="50">
           Open the dashboard to connect Trakt, add lists, and copy the personal manifest link for Stremio.
         </p>
-        <div class="mt-8 flex justify-center gap-3" data-aos="fade-up" data-aos-delay="100">
-          <a href="/dashboard" class="relative overflow-hidden rounded-lg px-5 py-3 font-semibold bg-[#6aa5ff] hover:bg-[#5b8ef0] shadow-[0_10px_30px_rgba(0,0,0,.45)]">
+        <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-center gap-3" data-aos="fade-up" data-aos-delay="100">
+          <a href="/dashboard" class="relative overflow-hidden rounded-lg px-6 py-4 font-semibold bg-[#6aa5ff] hover:bg-[#5b8ef0] shadow-[0_10px_30px_rgba(0,0,0,.45)]">
             <span class="pointer-events-none absolute -left-1/2 -top-full h-[300%] w-1/2 rotate-25 bg-gradient-to-r from-transparent via-white/35 to-transparent animate-[shine_2.8s_linear_infinite]"></span>
             Open dashboard
           </a>
-          <a href="/register" class="rounded-lg px-5 py-3 font-semibold bg-white/10 hover:bg-white/15 border border-white/10">
+          <a href="/register" class="rounded-lg px-6 py-4 font-semibold bg-white/10 hover:bg-white/15 border border-white/10">
             Register
           </a>
         </div>
@@ -174,9 +222,9 @@
     </section>
 
     <!-- FAQ -->
-    <section id="faq" class="py-16 md:py-24">
-      <div class="mx-auto max-w-5xl px-6">
-        <h2 class="text-2xl md:text-3xl font-bold mb-8" data-aos="fade-up">Frequently asked questions</h2>
+    <section id="faq" class="py-12 sm:py-16 md:py-24">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6">
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-6 sm:mb-8 text-center md:text-left" data-aos="fade-up">Frequently asked questions</h2>
         <div class="space-y-4">
           <details class="rounded-lg p-4 border border-white/10 bg-white/5 backdrop-blur" data-aos="fade-up" open>
             <summary class="cursor-pointer font-semibold">Do I need a Trakt account?</summary>
@@ -211,10 +259,10 @@
       </div>
     </section>
 
-    <footer class="border-t border-white/10 py-8">
-      <div class="mx-auto max-w-7xl px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="text-xs text-white/50">© 2025 TraktSync — Self‑hosted Stremio add‑on</div>
-        <div class="flex gap-4 text-xs text-white/60">
+    <footer class="border-t border-white/10 py-6 sm:py-8">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="text-xs text-white/50 text-center md:text-left">© 2025 TraktSync — Self‑hosted Stremio add‑on</div>
+        <div class="flex flex-wrap justify-center md:justify-end gap-4 text-xs text-white/60">
           <a href="/login" class="hover:text-white">Login</a>
           <a href="/register" class="hover:text-white">Register</a>
           <a href="/dashboard" class="hover:text-white">Open dashboard</a>
@@ -225,6 +273,170 @@
     <script type="module" src="/src/landing/main.tsx"></script>
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <script>try{AOS.init({duration:700,once:true,offset:60});}catch(e){}</script>
+    
+    <!-- Mobile menu functionality -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Enhanced theme toggle with smooth transitions and persistent storage
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+        
+        // Get saved theme or default to dark
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(savedTheme);
+        
+        function setTheme(theme) {
+          body.setAttribute('data-theme', theme);
+          localStorage.setItem('theme', theme);
+          
+          // Update icon with smooth transition
+          if (theme === 'light') {
+            // Light mode - sun icon
+            themeIcon.setAttribute('d', 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z');
+            
+            // Update body classes for light theme with better contrast
+            body.className = body.className
+              .replace('text-slate-100', 'text-slate-900')
+              .replace('bg-[#0b0f17]', 'bg-white')
+              .replace('[background-image:radial-gradient(1200px_800px_at_10%_-10%,rgba(106,165,255,.28),transparent_60%),radial-gradient(1200px_800px_at_110%_10%,rgba(192,132,252,.28),transparent_60%)]', '[background-image:radial-gradient(1200px_800px_at_10%_-10%,rgba(59,130,246,.08),transparent_60%),radial-gradient(1200px_800px_at_110%_10%,rgba(139,92,246,.06),transparent_60%)]')
+              .replace('selection:bg-[#6aa5ff]/30', 'selection:bg-[#3b82f6]/20');
+              
+            // Update text colors for light theme
+            const textElements = document.querySelectorAll('.text-white\\/70, .text-white\\/60, .text-white\\/50');
+            textElements.forEach(el => {
+              if (el.classList.contains('text-white/70')) {
+                el.classList.replace('text-white/70', 'text-slate-600');
+              } else if (el.classList.contains('text-white/60')) {
+                el.classList.replace('text-white/60', 'text-slate-500');
+              } else if (el.classList.contains('text-white/50')) {
+                el.classList.replace('text-white/50', 'text-slate-400');
+              }
+            });
+          } else {
+            // Dark mode - moon icon
+            themeIcon.setAttribute('d', 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z');
+            
+            // Update body classes for dark theme
+            body.className = body.className
+              .replace('text-slate-900', 'text-slate-100')
+              .replace('bg-white', 'bg-[#0b0f17]')
+              .replace('[background-image:radial-gradient(1200px_800px_at_10%_-10%,rgba(59,130,246,.08),transparent_60%),radial-gradient(1200px_800px_at_110%_10%,rgba(139,92,246,.06),transparent_60%)]', '[background-image:radial-gradient(1200px_800px_at_10%_-10%,rgba(106,165,255,.28),transparent_60%),radial-gradient(1200px_800px_at_110%_10%,rgba(192,132,252,.28),transparent_60%)]')
+              .replace('selection:bg-[#3b82f6]/20', 'selection:bg-[#6aa5ff]/30');
+              
+            // Restore text colors for dark theme
+            const textElements = document.querySelectorAll('.text-slate-600, .text-slate-500, .text-slate-400');
+            textElements.forEach(el => {
+              if (el.classList.contains('text-slate-600')) {
+                el.classList.replace('text-slate-600', 'text-white/70');
+              } else if (el.classList.contains('text-slate-500')) {
+                el.classList.replace('text-slate-500', 'text-white/60');
+              } else if (el.classList.contains('text-slate-400')) {
+                el.classList.replace('text-slate-400', 'text-white/50');
+              }
+            });
+          }
+          
+          // Update header background with theme-aware colors
+          const header = document.querySelector('header');
+          if (header) {
+            if (theme === 'light') {
+              header.className = header.className
+                .replace('bg-[#0b0f17]/80', 'bg-white/80')
+                .replace('border-white/10', 'border-black/10');
+            } else {
+              header.className = header.className
+                .replace('bg-white/80', 'bg-[#0b0f17]/80')
+                .replace('border-black/10', 'border-white/10');
+            }
+          }
+        }
+        
+        if (themeToggle) {
+          themeToggle.addEventListener('click', function() {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            // Add visual feedback
+            themeToggle.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+              themeToggle.style.transform = '';
+            }, 150);
+            
+            setTheme(newTheme);
+          });
+        }
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = mobileMenuBtn.querySelector('svg path');
+        
+        if (mobileMenuBtn && mobileMenu) {
+          mobileMenuBtn.addEventListener('click', function() {
+            const isHidden = mobileMenu.classList.contains('hidden');
+            
+            if (isHidden) {
+              mobileMenu.classList.remove('hidden');
+              mobileMenu.style.maxHeight = '0';
+              mobileMenu.style.opacity = '0';
+              
+              // Animate open
+              requestAnimationFrame(() => {
+                mobileMenu.style.transition = 'max-height 0.3s ease-out, opacity 0.3s ease-out';
+                mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px';
+                mobileMenu.style.opacity = '1';
+              });
+              
+              // Change to X icon
+              menuIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+            } else {
+              // Animate close
+              mobileMenu.style.transition = 'max-height 0.3s ease-in, opacity 0.3s ease-in';
+              mobileMenu.style.maxHeight = '0';
+              mobileMenu.style.opacity = '0';
+              
+              setTimeout(() => {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.style.transition = '';
+              }, 300);
+              
+              // Change back to hamburger icon
+              menuIcon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+            }
+          });
+          
+          // Close menu when clicking on links
+          const menuLinks = mobileMenu.querySelectorAll('a');
+          menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+              mobileMenu.style.transition = 'max-height 0.3s ease-in, opacity 0.3s ease-in';
+              mobileMenu.style.maxHeight = '0';
+              mobileMenu.style.opacity = '0';
+              
+              setTimeout(() => {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.style.transition = '';
+              }, 300);
+              
+              menuIcon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+            });
+          });
+        }
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+              target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              });
+            }
+          });
+        });
+      });
+    </script>
 
     <style>
       @keyframes shine{0%{left:-60%}60%{left:120%}100%{left:120%}}

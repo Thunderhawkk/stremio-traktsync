@@ -3,63 +3,289 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Register — Trakt Lists</title>
-    <link rel="stylesheet" href="/css/auth.css?v=2025-09-03-2140" />
+    <title>Create Account — Stremio Trakt Multi-User</title>
+    <link rel="stylesheet" href="/css/auth-enhanced.css?v=2025-09-05-enhanced" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Create your account to manage Trakt lists and Stremio add-ons" />
   </head>
   <body>
     <div class="page">
       <header class="header">
         <div class="brand">
-          <div class="brand-badge"></div>
-          <div class="site">Trakt Lists</div>
+          <div class="brand-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="site">Stremio Trakt</div>
         </div>
         <div class="spacer"></div>
         <button id="themeToggle" class="theme-toggle btn ghost" type="button" aria-label="Toggle theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           <span>Theme</span>
         </button>
       </header>
 
       <main class="container">
-        <div class="card" style="max-width:520px;margin:0 auto;">
-          <h1 style="margin:0 0 6px 0;">Create account</h1>
-          <p class="small" style="margin-top:0;">Set up access to configure your Trakt lists.</p>
-
-          <form id="regForm" novalidate>
-            <div class="form-row">
-              <label for="username">Username</label>
-              <input id="username" name="username" autocomplete="username" required />
+        <div class="auth-wrapper">
+          <div class="auth-card">
+            <div class="auth-header">
+              <h1 class="auth-title">Create your account</h1>
+              <p class="auth-subtitle">Join thousands of users managing their Trakt collections</p>
             </div>
 
-            <div class="form-row">
-              <label for="email">Email (optional)</label>
-              <input id="email" name="email" type="email" autocomplete="email" />
-            </div>
+            <form id="regForm" class="auth-form" novalidate>
+              <div class="form-group">
+                <label for="username" class="form-label">Username <span class="required">*</span></label>
+                <div class="form-field">
+                  <input 
+                    id="username" 
+                    name="username" 
+                    type="text"
+                    autocomplete="username" 
+                    required 
+                    class="form-input"
+                    placeholder="Choose a unique username"
+                    minlength="3"
+                    maxlength="30"
+                  />
+                  <div class="field-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div class="field-validation"></div>
+                </div>
+                <div class="field-help">3-30 characters, letters, numbers, and underscores only</div>
+              </div>
 
-            <div class="form-row">
-              <label for="password">Password</label>
-              <input id="password" name="password" type="password" autocomplete="new-password" required />
-            </div>
+              <div class="form-group">
+                <label for="email" class="form-label">Email address</label>
+                <div class="form-field">
+                  <input 
+                    id="email" 
+                    name="email" 
+                    type="email" 
+                    autocomplete="email" 
+                    class="form-input"
+                    placeholder="Enter your email (optional)"
+                  />
+                  <div class="field-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div class="field-validation"></div>
+                </div>
+                <div class="field-help">Optional: for account recovery and notifications</div>
+              </div>
 
-            <div class="actions">
-              <button type="submit" class="btn primary">Create account</button>
-              <a class="button secondary btn ghost" href="/login" style="text-decoration:none;">Back to login</a>
-            </div>
+              <div class="form-group">
+                <label for="password" class="form-label">Password <span class="required">*</span></label>
+                <div class="form-field">
+                  <input 
+                    id="password" 
+                    name="password" 
+                    type="password" 
+                    autocomplete="new-password" 
+                    required 
+                    class="form-input"
+                    placeholder="Create a strong password"
+                    minlength="8"
+                  />
+                  <div class="field-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                    <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <svg class="eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <div class="field-validation"></div>
+                </div>
+                <div class="password-strength">
+                  <div class="strength-meter">
+                    <div class="strength-bar"></div>
+                  </div>
+                  <div class="strength-text">Password strength</div>
+                </div>
+                <div class="field-help">At least 8 characters with a mix of letters, numbers, and symbols</div>
+              </div>
 
-            <div id="msg" class="small" aria-live="polite" style="min-height:1.2em;margin-top:8px;"></div>
-          </form>
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="terms" required class="checkbox-input">
+                  <span class="checkbox-custom"></span>
+                  <span class="checkbox-text">I agree to the <a href="/terms" target="_blank" class="auth-link">Terms of Service</a> and <a href="/privacy" target="_blank" class="auth-link">Privacy Policy</a></span>
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn primary btn-large">
+                  <span class="btn-text">Create account</span>
+                  <div class="btn-loader">
+                    <div class="spinner"></div>
+                  </div>
+                </button>
+              </div>
+
+              <div class="form-divider">
+                <span>or</span>
+              </div>
+
+              <div class="oauth-providers">
+                <a href="/auth/google" class="btn oauth google">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                  Sign up with Google
+                </a>
+                <a href="/auth/github" class="btn oauth github">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                  </svg>
+                  Sign up with GitHub
+                </a>
+              </div>
+
+              <div id="msg" class="form-message" aria-live="polite"></div>
+            </form>
+
+            <div class="auth-footer">
+              <p>Already have an account? <a href="/login" class="auth-link">Sign in here</a></p>
+            </div>
+          </div>
         </div>
       </main>
 
-      <footer class="footer small">© Trakt Lists</footer>
+      <footer class="footer">
+        <div class="footer-content">
+          <p>&copy; 2024 Stremio Trakt Multi-User. Open source project.</p>
+          <div class="footer-links">
+            <a href="https://github.com/your-repo" target="_blank" rel="noopener">GitHub</a>
+            <a href="/docs" target="_blank">Documentation</a>
+          </div>
+        </div>
+      </footer>
     </div>
 
     <script src="/public/theme.js"></script>
     <script src="/public/register.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.auth-card,.card,.tabs-sticky,.actions').forEach((el, i) => {
-          el.classList.add(i % 2 ? 'fade-up' : 'scale-in');
-          el.classList.add(`stagger-${(i % 3) + 1}`);
+        // Enhanced animations
+        const authCard = document.querySelector('.auth-card');
+        const formGroups = document.querySelectorAll('.form-group');
+        
+        authCard?.classList.add('animate-in');
+        formGroups.forEach((group, i) => {
+          group.style.animationDelay = `${(i + 1) * 0.1}s`;
+          group.classList.add('slide-in');
+        });
+        
+        // Password toggle functionality
+        const passwordToggle = document.querySelector('.password-toggle');
+        const passwordInput = document.getElementById('password');
+        const eyeOpen = passwordToggle?.querySelector('.eye-open');
+        const eyeClosed = passwordToggle?.querySelector('.eye-closed');
+        
+        passwordToggle?.addEventListener('click', () => {
+          const isPassword = passwordInput.type === 'password';
+          passwordInput.type = isPassword ? 'text' : 'password';
+          eyeOpen.style.display = isPassword ? 'none' : 'block';
+          eyeClosed.style.display = isPassword ? 'block' : 'none';
+        });
+        
+        // Password strength checker
+        const strengthBar = document.querySelector('.strength-bar');
+        const strengthText = document.querySelector('.strength-text');
+        
+        function checkPasswordStrength(password) {
+          let score = 0;
+          let feedback = 'Very weak';
+          
+          if (password.length >= 8) score++;
+          if (password.match(/[a-z]/)) score++;
+          if (password.match(/[A-Z]/)) score++;
+          if (password.match(/[0-9]/)) score++;
+          if (password.match(/[^a-zA-Z0-9]/)) score++;
+          
+          const strength = ['Very weak', 'Weak', 'Fair', 'Good', 'Strong'][score];
+          const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#16a34a'];
+          
+          strengthBar.style.width = `${(score / 5) * 100}%`;
+          strengthBar.style.backgroundColor = colors[score];
+          strengthText.textContent = strength;
+          
+          return score;
+        }
+        
+        passwordInput?.addEventListener('input', (e) => {
+          const password = e.target.value;
+          if (password) {
+            document.querySelector('.password-strength').style.display = 'block';
+            checkPasswordStrength(password);
+          } else {
+            document.querySelector('.password-strength').style.display = 'none';
+          }
+        });
+        
+        // Form validation feedback
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+          input.addEventListener('blur', () => {
+            const group = input.closest('.form-group');
+            if (input.value.trim() && input.checkValidity()) {
+              group.classList.add('valid');
+              group.classList.remove('invalid');
+            } else if (input.value.trim()) {
+              group.classList.add('invalid');
+              group.classList.remove('valid');
+            }
+          });
+          
+          input.addEventListener('input', () => {
+            const group = input.closest('.form-group');
+            group.classList.remove('invalid', 'valid');
+          });
+        });
+        
+        // Username validation
+        const usernameInput = document.getElementById('username');
+        usernameInput?.addEventListener('input', (e) => {
+          const username = e.target.value;
+          const validation = document.querySelector('#username + .field-icon + .field-validation');
+          
+          if (username.length < 3) {
+            validation.textContent = 'Too short';
+            validation.className = 'field-validation error';
+          } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            validation.textContent = 'Only letters, numbers, and underscores';
+            validation.className = 'field-validation error';
+          } else {
+            validation.textContent = 'Looks good!';
+            validation.className = 'field-validation success';
+          }
         });
       });
     </script>

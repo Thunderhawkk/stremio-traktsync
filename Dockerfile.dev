@@ -1,0 +1,29 @@
+# Development Dockerfile with hot reload
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Install dashboard UI dependencies
+COPY dashboard-ui/package.json ./dashboard-ui/
+RUN cd dashboard-ui && npm ci
+
+# Copy source code
+COPY . .
+
+# Create a non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodeapp
+RUN chown -R nodeapp:nodejs /app
+
+USER nodeapp
+
+EXPOSE 8084
+
+ENV NODE_ENV=development
+ENV PORT=8084
+
+CMD ["npm", "run", "dev"]
