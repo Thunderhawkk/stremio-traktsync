@@ -86,7 +86,7 @@ router.post('/config', validate(saveSchema), async (req, res) => {
     const maxOrder = existing.reduce((m, r) => Number.isInteger(r.order) ? Math.max(m, r.order) : m, -1);
     let nextOrder = maxOrder + 1;
     const normalized = lists.map((l) => ({
-      id: (l.id && typeof l.id === 'string' && l.id) ? l.id : undefined,
+      id: (l.id && typeof l.id === 'string' && l.id) ? l.id : uuidv4(),
       name: (l.name || '').trim(),
       url: typeof l.url === 'string' ? l.url.trim() : '',
       type: l.type === 'series' ? 'series' : 'movie',

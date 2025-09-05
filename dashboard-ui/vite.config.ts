@@ -8,7 +8,10 @@ export default defineConfig({
     rollupOptions: {
       input: {
         dashboard: resolve(__dirname, 'index.html'),
-        landing: resolve(__dirname, 'landing.html')
+        landing: resolve(__dirname, 'landing.html'),
+        analytics: resolve(__dirname, 'analytics.html'),
+        health: resolve(__dirname, 'health.html'),
+        audit: resolve(__dirname, 'audit.html')
       }
     }
   }

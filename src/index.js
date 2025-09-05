@@ -8,9 +8,14 @@ const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const path = require('path');
+const { createServer } = require('http');
+const websocketService = require('./services/websocketService');
 const passport = require('./config/oauth2');
 const scheduler = require('./jobs/scheduler');
 const databaseMonitor = require('./services/databaseMonitor');
+const healthMonitor = require('./services/healthMonitor');
+const { performanceAlerts } = require('./services/performanceAlerts');
+const { trackHealth } = require('./middleware/healthTracking');
 
 const { logger } = require('./utils/logger');
 const { initDb } = require('./db/repo');
@@ -22,11 +27,20 @@ const configRoutes  = require('./routes/config');
 const traktRoutes   = require('./routes/trakt');
 const addonRoutes   = require('./routes/addon');
 const debugRoutes   = require('./routes/debug');
+const healthRoutes  = require('./routes/health');
+const sessionRoutes = require('./routes/session');
+const auditRoutes   = require('./routes/audit');
+const performanceAlertsRoutes = require('./routes/performanceAlerts');
 
-const { attachSessionUser, absoluteSessionTimeout } = require('./middleware/session_timebox');
-const { limiterApp, limiterAuthStrict } = require('./middleware/rate_limit');
+const { attachSessionUser, absoluteSessionTimeout, enhancedSessionTracking } = require('./middleware/session_timebox');
+const { limiterApp, limiterAuthStrict, limiterAPI, limiterDashboard, limiterHeavyOps, limiterSession, limiterHealth, getRateLimitStatus } = require('./middleware/rate_limit');
+const { auditLogger } = require('./middleware/auditLogger');
+const { requireAdminForPage, requireAdmin } = require('./middleware/adminAuth');
 const { router: listsRouter } = require('./routes/lists');
 const stremioRoutes = require('./routes/stremio');
+// Collections removed - no longer needed
+// Recommendations removed
+const watchlistRoutes = require('./routes/watchlist');
 
 const app = express();
 
@@ -83,9 +97,21 @@ app.use(session({
 
 app.use(attachSessionUser);
 app.use(absoluteSessionTimeout({ absoluteMs: ABS_MIN * 60 * 1000 }));
+app.use(enhancedSessionTracking); // Enhanced session tracking
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(limiterApp);
+
+// Audit logging middleware (after rate limiting, before health tracking)
+app.use(auditLogger({
+  enablePerformanceLogging: true,
+  enableErrorLogging: true,
+  enableSecurityLogging: true,
+  skipSuccessfulGets: true
+}));
+
+// Health tracking middleware (after auth setup)
+app.use(trackHealth);
 
 // Legacy static assets used by server-rendered pages
 app.use('/css',    express.static(path.join(__dirname, '..', 'public', 'css'), { immutable: true, maxAge: '7d' }));
@@ -109,8 +135,23 @@ app.get(['/install', '/u/install'], (req, res, next) => {
   res.sendFile(path.join(distDir, 'landing.html'), err => err && next(err));
 });
 
+// Analytics page (public)
+app.get(['/analytics', '/analytics/*'], (req, res, next) => {
+  res.sendFile(path.join(distDir, 'analytics.html'), err => err && next(err));
+});
+
+// Health monitoring page (requires admin authentication)
+app.get(['/health', '/health/*'], requireAdminForPage, (req, res, next) => {
+  res.sendFile(path.join(distDir, 'health.html'), err => err && next(err));
+});
+
+// Audit logs page (requires admin authentication)
+app.get(['/audit', '/audit/*'], requireAdminForPage, (req, res, next) => {
+  res.sendFile(path.join(distDir, 'audit.html'), err => err && next(err));
+});
+
 // Protect dashboard shell: redirect unauthenticated to login
-app.get(['/dashboard', '/dashboard/*'], (req, res, next) => {
+app.get(['/dashboard', '/dashboard/*'], limiterDashboard, (req, res, next) => {
   if (!req.session || !req.session.user) return res.redirect('/login');
   res.sendFile(path.join(distDir, 'index.html'), err => err && next(err));
 });
@@ -121,6 +162,9 @@ app.get('/reorder/*', (req,res) =>
   res.sendFile(path.join(__dirname, '..', 'vendor', 'stremio-addon-manager', 'dist', 'index.html'))
 );
 
+// Health
+app.get('/healthz', (_req, res) => res.json({ ok: true }));
+
 // IMPORTANT: server-rendered pages AFTER SPA mounts so /dashboard stays SPA.
 // This ensures /login and /register are handled by legacy templates (not SPA), fixing blank pages.
 app.use(pages);
@@ -129,22 +173,54 @@ app.use(pages);
 app.use('/api/auth', limiterAuthStrict, authRoutes);
 app.use('/auth', oauth2Routes);
 
+// WebSocket status endpoint (public) - moved before API auth
+app.get('/ws/status', (_req, res) => {
+  const stats = websocketService.getConnectionStats();
+  res.json({
+    connected: stats.connected,
+    status: websocketService.isHealthy() ? 'active' : 'inactive',
+    isInitialized: stats.isInitialized
+  });
+});
+
 // Debug + config
 app.use('/api', debugRoutes);
 app.use('/api', configRoutes);
 
+// Rate limit status endpoint
+app.get('/api/rate-limit/status', getRateLimitStatus);
+
+// Health monitoring API (admin only)
+app.use('/api/health', limiterHealth, requireAdmin, healthRoutes);
+
+// Session management API
+app.use('/api/session', limiterSession, sessionRoutes);
+
+// Audit logging API (admin only)
+app.use('/api/audit', limiterAPI, requireAdmin, auditRoutes);
+
+// Performance alerts API (admin only)
+app.use('/api/alerts', limiterAPI, requireAdmin, performanceAlertsRoutes);
+
 // Trakt API
 app.use('/api/trakt', traktRoutes);
 
-// Lists + Stremio APIs
-app.use('/api', listsRouter);
-app.use('/api/stremio', stremioRoutes);
+// Lists + Stremio APIs (heavy operations)
+app.use('/api', limiterAPI, listsRouter);
+app.use('/api/stremio', limiterAPI, stremioRoutes);
+
+// Collections API - removed
+
+// Recommendations API - removed
+
+// Watchlist Analytics API (heavy operations)
+app.use('/api/watchlist', limiterHeavyOps, watchlistRoutes);
 
 // Addon public routes
 app.use('/u', addonRoutes);
 
-// Health
-app.get('/healthz', (_req, res) => res.json({ ok: true }));
+// Health (already defined above)
+// app.get('/healthz', (_req, res) => res.json({ ok: true }));
 
 // Errors
 app.use(require('./middleware/error').notFound);
@@ -155,6 +231,22 @@ app.use(require('./middleware/error').errorHandler);
   await initDb();
   scheduler.start(); // <-- start token refresh + prewarm loops
   databaseMonitor.start(); // <-- start database monitoring
+  healthMonitor.start(); // <-- start comprehensive health monitoring
+  performanceAlerts.start(); // <-- start performance alerts system
+  
   const port = process.env.PORT || 8080;
-  app.listen(port, () => logger.info({ port, env: process.env.NODE_ENV || 'development' }, 'server_started'));
+  
+  // Create HTTP server
+  const httpServer = createServer(app);
+  
+  // Initialize WebSocket service
+  websocketService.initialize(httpServer);
+  
+  httpServer.listen(port, () => {
+    logger.info({ 
+      port, 
+      env: process.env.NODE_ENV || 'development',
+      websockets: websocketService.isHealthy()
+    }, 'server_started_with_websockets');
+  });
 })();

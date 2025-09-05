@@ -2,7 +2,7 @@
   "addonName": "TraktSync",
   "catalogPrefix": "TraktSync",
   "manifestVersion": 1,
-  "lastAutoRefreshAt": "2025-09-04T23:58:53.266Z",
+  "lastAutoRefreshAt": "2025-09-05T09:24:57.368Z",
   "lastManualRefreshAt": null,
   "lists": [
     {
@@ -21,8 +21,8 @@
       "order": 0,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-05T05:22:11.089Z",
-      "updatedAt": "2025-09-05T05:22:11.089Z"
+      "createdAt": "2025-09-05T06:07:26.034Z",
+      "updatedAt": "2025-09-05T06:07:26.034Z"
     },
     {
       "id": "bebdd2b2-f7f0-4603-a1e1-83db8f8c0b65",
@@ -40,8 +40,8 @@
       "order": 1,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-05T05:22:11.089Z",
-      "updatedAt": "2025-09-05T05:22:11.089Z"
+      "createdAt": "2025-09-05T06:07:26.034Z",
+      "updatedAt": "2025-09-05T06:07:26.034Z"
     },
     {
       "id": "c62c64a2-1ead-4c5b-9886-5ec9a0a597ed",
@@ -59,16 +59,16 @@
       "order": 2,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-05T05:22:11.089Z",
-      "updatedAt": "2025-09-05T05:22:11.089Z"
+      "createdAt": "2025-09-05T06:07:26.034Z",
+      "updatedAt": "2025-09-05T06:07:26.034Z"
     }
   ],
   "addonToken": "95de27d20f3805195e81e0b9daa349a2",
   "traktTokens": {
-    "access_token": "21a1b7c50572fa19afa7462ec9a92bf90720bdcab0092212418cd99041e1a18c",
-    "refresh_token": "8ed8bd8f63d39c56f7e1938433de1c02d71cdc2f25af4ca1e607c9ce283b95ca",
-    "expires_at": "2025-09-05T23:59:44.000Z"
+    "access_token": "5ead0f66195272422377ba2a8db33d7d19fa6889bf65faa147c91c42ded36b32",
+    "refresh_token": "a9ec295b3e3f3673949163bb40d6ff16e5c0a875e16bb0b619bc2a0472c66e68",
+    "expires_at": "2025-09-06T09:25:48.000Z"
   },
-  "hideUnreleasedAll": true,
+  "hideUnreleasedAll": false,
   "lastDeltaAt": "2025-09-05T03:02:55.725Z"
 }

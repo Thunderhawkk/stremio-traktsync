@@ -168,6 +168,8 @@ async function getUserListItems({ userId, urlOrSlug, stremioType, limit = 50, pa
   return [];
 }
 
+// Personalized list functions removed
+
 
 module.exports = {
   deviceInit,

@@ -9,6 +9,7 @@ import { Banner } from "../components/ui/banner";
 import CatalogSettings from "../sections/CatalogSettings";
 import MyTraktLists from "../sections/MyTraktLists";
 import ReorderPanel from "../sections/ReorderPanel";
+// PersonalizedLists removed
 
 // Custom Error Boundary Component
 class AppErrorBoundary extends React.Component<

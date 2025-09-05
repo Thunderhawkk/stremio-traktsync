@@ -6,8 +6,8 @@
     "passwordHash": "$argon2id$v=19$m=65536,t=2,p=1$M3UG9iIv03PcrfpEi3l/zg$HJncVFOHOZkbpqjgy0JFxnLCWR9WaYklTN5iKXBGmJo",
     "role": "admin",
     "createdAt": "2025-08-26T14:52:37.871Z",
-    "updatedAt": "2025-09-05T02:01:35.933Z",
-    "lastLoginAt": "2025-09-05T05:22:04.702Z",
+    "updatedAt": "2025-09-05T09:28:35.643Z",
+    "lastLoginAt": "2025-09-05T10:29:46.401Z",
     "addonToken": "d361fa0d48b7ab632eeaea7b292b6154"
   },
   {
@@ -26,5 +26,19 @@
     "role": "user",
     "createdAt": "2025-08-31T01:59:26.158Z",
     "updatedAt": "2025-08-31T01:59:26.158Z"
+  },
+  {
+    "id": "8f50b978-f51c-419d-82a5-cfde59d94128",
+    "username": "Yash Shirsath",
+    "email": "yashshirsath2008@gmail.com",
+    "passwordHash": null,
+    "role": "user",
+    "provider": "google",
+    "provider_id": "113370991142019148476",
+    "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocI0-6lPbinl6Kb5PVuNGMt8VPVHnwcVrU3E3IWJXPxOUkXEWw=s96-c",
+    "email_verified": true,
+    "createdAt": "2025-09-05T09:53:14.146Z",
+    "updatedAt": "2025-09-05T09:53:14.146Z",
+    "lastLoginAt": "2025-09-05T10:29:59.418Z"
   }
 ]

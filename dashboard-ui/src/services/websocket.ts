@@ -98,14 +98,7 @@ class WebSocketClient {
       this.emit('sync:response', data);
     });
 
-    // Handle list events
-    this.socket.on('list:updated', (data: any) => {
-      this.emit('list:updated', data);
-    });
-
-    this.socket.on('list:update:error', (data: any) => {
-      this.emit('list:error', data);
-    });
+    // List events removed
 
     // Handle Trakt events
     this.socket.on('trakt:refresh:progress', (data: ProgressUpdate) => {
@@ -158,18 +151,7 @@ class WebSocketClient {
     });
   }
 
-  public updateList(listId: string, changes: any): void {
-    if (!this.isConnected || !this.socket) {
-      console.warn('WebSocket not connected, cannot update list');
-      return;
-    }
-
-    this.socket.emit('list:update', {
-      listId,
-      changes,
-      timestamp: new Date().toISOString()
-    });
-  }
+  // List update method removed
 
   public refreshTrakt(): void {
     if (!this.isConnected || !this.socket) {

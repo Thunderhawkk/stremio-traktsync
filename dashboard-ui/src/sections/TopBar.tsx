@@ -6,16 +6,46 @@ const setAttr = (name:string, val:string) => document.documentElement.setAttribu
 const getAttr = (name:string, fallback:string) => document.documentElement.getAttribute(name) || fallback;
 
 export default function TopBar(){
-  const onCompact = () => {
-    const cur = getAttr("data-density", "cozy");
-    const next = cur === "compact" ? "cozy" : "compact";
-    setAttr("data-density", next); localStorage.setItem("ui-density", next);
+  const [userRole, setUserRole] = React.useState<string | null>(null);
+  
+  React.useEffect(() => {
+    // Fetch user data to check role
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok && data.user) {
+          setUserRole(data.user.role);
+        }
+      })
+      .catch(() => {});
+  }, []);
+  
+  const onAnalytics = () => {
+    window.open('/analytics', '_blank');
   };
-  const onBackground = () => {
-    const cur = getAttr("data-bg", "off");
-    const next = cur === "on" ? "off" : "on";
-    setAttr("data-bg", next); localStorage.setItem("ui-bg", next);
+  
+  const onHealth = () => {
+    window.open('/health', '_blank');
   };
+  
+  const onAuditLogs = () => {
+    window.open('/audit', '_blank');
+  };
+  
+  const onLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Logout failed:', error);
+      window.location.href = '/login';
+    }
+  };
+  
+  const onLogoClick = () => {
+    window.location.href = '/';
+  };
+  
   const onTheme = () => {
     const cur = getAttr("data-theme", "dark");
     const next = cur === "light" ? "dark" : "light";
@@ -33,8 +63,6 @@ export default function TopBar(){
   
   React.useEffect(()=>{
     const t = localStorage.getItem("ui-theme"); if (t) setAttr("data-theme", t);
-    const d = localStorage.getItem("ui-density"); if (d) setAttr("data-density", d);
-    const b = localStorage.getItem("ui-bg"); if (b) setAttr("data-bg", b);
   }, []);
   
   return (
@@ -43,7 +71,10 @@ export default function TopBar(){
         {/* Enhanced Left section */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[var(--color-primary)] to-accent shadow-glow animate-float relative overflow-hidden hover:shadow-[0_15px_40px_rgba(106,165,255,.4)] transition-all duration-300 group">
+            <div 
+              onClick={onLogoClick}
+              className="h-8 w-8 rounded-lg bg-gradient-to-br from-[var(--color-primary)] to-accent shadow-glow animate-float relative overflow-hidden hover:shadow-[0_15px_40px_rgba(106,165,255,.4)] transition-all duration-300 group cursor-pointer"
+            >
               <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             <h1 className="text-lg font-semibold gradient-text">TraktSync Dashboard</h1>
@@ -57,6 +88,49 @@ export default function TopBar(){
         
         {/* Enhanced Right section */}
         <div className="flex items-center gap-2">
+          {/* Analytics Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onAnalytics}
+            className="h-9 px-3 rounded-lg hover:bg-white/10 focus:ring-2 focus:ring-[var(--color-primary)]/50 transition-all duration-300 group"
+          >
+            <svg className="h-4 w-4 mr-1 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <span className="text-xs hidden sm:inline">Analytics</span>
+          </Button>
+          
+          {/* Health Monitoring Button (Admin only) */}
+          {userRole === 'admin' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onHealth}
+              className="h-9 px-3 rounded-lg hover:bg-white/10 focus:ring-2 focus:ring-[var(--color-primary)]/50 transition-all duration-300 group"
+            >
+              <svg className="h-4 w-4 mr-1 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              </svg>
+              <span className="text-xs hidden sm:inline">Health</span>
+            </Button>
+          )}
+          
+          {/* Audit Logs Button (Admin only) */}
+          {userRole === 'admin' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onAuditLogs}
+              className="h-9 px-3 rounded-lg hover:bg-white/10 focus:ring-2 focus:ring-[var(--color-primary)]/50 transition-all duration-300 group"
+            >
+              <svg className="h-4 w-4 mr-1 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <span className="text-xs hidden sm:inline">Audit</span>
+            </Button>
+          )}
+          
           {/* Theme Toggle with enhanced icon */}
           <Button
             variant="ghost"
@@ -71,30 +145,17 @@ export default function TopBar(){
             </svg>
           </Button>
           
-          {/* Density Toggle */}
+          {/* Logout Button - moved to the end */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={onCompact}
-            className="h-9 px-3 rounded-lg hover:bg-white/10 focus:ring-2 focus:ring-[var(--color-primary)]/50 transition-all duration-300 group"
+            onClick={onLogout}
+            className="h-9 px-3 rounded-lg hover:bg-red-500/10 hover:text-red-400 focus:ring-2 focus:ring-red-500/50 transition-all duration-300 group"
           >
             <svg className="h-4 w-4 mr-1 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
             </svg>
-            <span className="text-xs hidden sm:inline">Density</span>
-          </Button>
-          
-          {/* Background Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onBackground}
-            className="h-9 px-3 rounded-lg hover:bg-white/10 focus:ring-2 focus:ring-[var(--color-primary)]/50 transition-all duration-300 group"
-          >
-            <svg className="h-4 w-4 mr-1 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
-            </svg>
-            <span className="text-xs hidden sm:inline">Effects</span>
+            <span className="text-xs hidden sm:inline">Logout</span>
           </Button>
         </div>
       </div>

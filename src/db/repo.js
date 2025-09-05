@@ -132,6 +132,37 @@ async function initDb() {
         updated_at TIMESTAMPTZ DEFAULT NOW()
       );
     `).catch(() => {});
+    
+    // Session management tables
+    await pg.query(`
+      CREATE TABLE IF NOT EXISTS user_sessions (
+        id TEXT PRIMARY KEY,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        user_agent TEXT NOT NULL,
+        ip_address INET,
+        device_info JSONB,
+        fingerprint TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        last_activity TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        is_active BOOLEAN NOT NULL DEFAULT true,
+        security_flags TEXT[],
+        last_suspicious_activity TIMESTAMPTZ,
+        expires_at TIMESTAMPTZ NOT NULL
+      );
+    `).catch(() => {});
+    
+    // Session indexes
+    await pg.query(`CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id, is_active, last_activity DESC);`).catch(() => {});
+    await pg.query(`CREATE INDEX IF NOT EXISTS idx_user_sessions_active ON user_sessions(is_active, last_activity) WHERE is_active = true;`).catch(() => {});
+    await pg.query(`CREATE INDEX IF NOT EXISTS idx_user_sessions_expires ON user_sessions(expires_at);`).catch(() => {});
+    
+    // Add session columns to users table
+    await pg.query(`
+      ALTER TABLE users 
+        ADD COLUMN IF NOT EXISTS last_session_id TEXT,
+        ADD COLUMN IF NOT EXISTS session_count INTEGER DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS last_ip_address INET;
+    `).catch(() => {});
     logger.info({ usePg }, 'db_initialized');
   } else {
     logger.warn('DATABASE_URL not set; using filesystem fallback');
@@ -551,6 +582,238 @@ const repo = {
       doc.lastManualRefreshAt = ts;
       await writeUserDocAtomic(userId, doc);
       return ts;
+    }
+  },
+
+  // Session Management Methods
+  async createSession(sessionData) {
+    if (usePg) {
+      const pg = await getPg();
+      await pg.query(
+        `INSERT INTO user_sessions(
+          id, user_id, user_agent, ip_address, device_info, fingerprint, 
+          created_at, last_activity, is_active, expires_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          sessionData.id,
+          sessionData.userId,
+          sessionData.userAgent,
+          sessionData.ipAddress,
+          JSON.stringify(sessionData.deviceInfo || {}),
+          sessionData.fingerprint,
+          sessionData.createdAt,
+          sessionData.lastActivity,
+          sessionData.isActive,
+          new Date(sessionData.createdAt.getTime() + 12 * 60 * 60 * 1000) // 12 hours from creation
+        ]
+      );
+      
+      // Update user's last session info
+      await pg.query(
+        `UPDATE users SET last_session_id=$1, last_ip_address=$2, session_count=COALESCE(session_count,0)+1, updated_at=NOW() WHERE id=$3`,
+        [sessionData.id, sessionData.ipAddress, sessionData.userId]
+      );
+    } else {
+      // For filesystem, store in user doc
+      const doc = await readUserDoc(sessionData.userId);
+      if (!doc.sessions) doc.sessions = [];
+      doc.sessions.push(sessionData);
+      doc.lastSessionId = sessionData.id;
+      doc.sessionCount = (doc.sessionCount || 0) + 1;
+      await writeUserDocAtomic(sessionData.userId, doc);
+    }
+  },
+
+  async getSession(sessionId) {
+    if (usePg) {
+      const pg = await getPg();
+      const { rows } = await pg.query(
+        `SELECT * FROM user_sessions WHERE id=$1 AND is_active=true AND expires_at > NOW()`,
+        [sessionId]
+      );
+      if (rows && rows[0]) {
+        const session = rows[0];
+        session.deviceInfo = session.device_info;
+        session.securityFlags = session.security_flags;
+        session.lastSuspiciousActivity = session.last_suspicious_activity;
+        return session;
+      }
+      return null;
+    } else {
+      // Search through all user docs for the session
+      const users = fsdb.read('users');
+      for (const user of users) {
+        const doc = await readUserDoc(user.id).catch(() => ({ sessions: [] }));
+        if (doc.sessions) {
+          const session = doc.sessions.find(s => s.id === sessionId && s.isActive);
+          if (session) return session;
+        }
+      }
+      return null;
+    }
+  },
+
+  async updateSession(sessionId, updates) {
+    if (usePg) {
+      const pg = await getPg();
+      const updateFields = [];
+      const values = [];
+      let paramIndex = 1;
+      
+      const columnMap = {
+        lastActivity: 'last_activity',
+        deviceInfo: 'device_info',
+        securityFlags: 'security_flags',
+        lastSuspiciousActivity: 'last_suspicious_activity'
+      };
+      
+      Object.keys(updates).forEach(key => {
+        if (updates[key] !== undefined) {
+          const dbColumn = columnMap[key] || key;
+          updateFields.push(`${dbColumn}=$${paramIndex}`);
+          let value = updates[key];
+          
+          // JSON stringify for objects
+          if (key === 'deviceInfo' && typeof value === 'object') {
+            value = JSON.stringify(value);
+          }
+          
+          values.push(value);
+          paramIndex++;
+        }
+      });
+      
+      if (updateFields.length > 0) {
+        values.push(sessionId);
+        await pg.query(
+          `UPDATE user_sessions SET ${updateFields.join(', ')} WHERE id=$${paramIndex}`,
+          values
+        );
+      }
+    } else {
+      // Update in filesystem
+      const users = fsdb.read('users');
+      for (const user of users) {
+        const doc = await readUserDoc(user.id).catch(() => ({ sessions: [] }));
+        if (doc.sessions) {
+          const sessionIndex = doc.sessions.findIndex(s => s.id === sessionId);
+          if (sessionIndex !== -1) {
+            Object.assign(doc.sessions[sessionIndex], updates);
+            await writeUserDocAtomic(user.id, doc);
+            break;
+          }
+        }
+      }
+    }
+  },
+
+  async destroySession(sessionId) {
+    if (usePg) {
+      const pg = await getPg();
+      await pg.query(
+        `UPDATE user_sessions SET is_active=false, last_activity=NOW() WHERE id=$1`,
+        [sessionId]
+      );
+    } else {
+      // Update in filesystem
+      const users = fsdb.read('users');
+      for (const user of users) {
+        const doc = await readUserDoc(user.id).catch(() => ({ sessions: [] }));
+        if (doc.sessions) {
+          const session = doc.sessions.find(s => s.id === sessionId);
+          if (session) {
+            session.isActive = false;
+            session.lastActivity = new Date();
+            await writeUserDocAtomic(user.id, doc);
+            break;
+          }
+        }
+      }
+    }
+  },
+
+  async getUserSessions(userId) {
+    if (usePg) {
+      const pg = await getPg();
+      const { rows } = await pg.query(
+        `SELECT * FROM user_sessions 
+         WHERE user_id=$1 AND is_active=true AND expires_at > NOW() 
+         ORDER BY last_activity DESC`,
+        [userId]
+      );
+      return rows.map(session => ({
+        ...session,
+        deviceInfo: session.device_info,
+        securityFlags: session.security_flags,
+        lastSuspiciousActivity: session.last_suspicious_activity
+      }));
+    } else {
+      const doc = await readUserDoc(userId).catch(() => ({ sessions: [] }));
+      return (doc.sessions || []).filter(s => s.isActive);
+    }
+  },
+
+  async getRecentUserSessions(userId, hours) {
+    if (usePg) {
+      const pg = await getPg();
+      const { rows } = await pg.query(
+        `SELECT * FROM user_sessions 
+         WHERE user_id=$1 AND created_at > NOW() - INTERVAL '${hours} hours' 
+         ORDER BY created_at DESC`,
+        [userId]
+      );
+      return rows.map(session => ({
+        ...session,
+        deviceInfo: session.device_info,
+        securityFlags: session.security_flags,
+        lastSuspiciousActivity: session.last_suspicious_activity
+      }));
+    } else {
+      const doc = await readUserDoc(userId).catch(() => ({ sessions: [] }));
+      const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
+      return (doc.sessions || []).filter(s => new Date(s.createdAt) > cutoff);
+    }
+  },
+
+  async cleanupExpiredSessions(absoluteTimeout, idleTimeout) {
+    if (usePg) {
+      const pg = await getPg();
+      const { rows } = await pg.query('SELECT cleanup_expired_sessions() as deleted_count');
+      return rows[0] ? rows[0].deleted_count : 0;
+    } else {
+      // Cleanup filesystem sessions
+      const users = fsdb.read('users');
+      let cleaned = 0;
+      
+      for (const user of users) {
+        try {
+          const doc = await readUserDoc(user.id);
+          if (doc.sessions) {
+            const now = new Date();
+            const originalLength = doc.sessions.length;
+            
+            doc.sessions = doc.sessions.filter(session => {
+              const createdAt = new Date(session.createdAt);
+              const lastActivity = new Date(session.lastActivity);
+              const timeSinceCreated = now - createdAt;
+              const timeSinceActivity = now - lastActivity;
+              
+              return session.isActive && 
+                     timeSinceCreated <= absoluteTimeout && 
+                     timeSinceActivity <= idleTimeout;
+            });
+            
+            if (doc.sessions.length !== originalLength) {
+              cleaned += originalLength - doc.sessions.length;
+              await writeUserDocAtomic(user.id, doc);
+            }
+          }
+        } catch (error) {
+          // Skip users with read errors
+        }
+      }
+      
+      return cleaned;
     }
   }
 };

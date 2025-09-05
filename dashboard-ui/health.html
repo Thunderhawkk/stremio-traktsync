@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-density="cozy" data-bg="off">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Monitoring - TraktSync Dashboard</title>
+  <style>
+    :root {
+      --color-primary: #6aa5ff;
+      --color-surface-0: #0a0b0d;
+      --color-surface-1: #111318;
+      --color-surface-2: #1a1d25;
+      --color-surface-3: #232833;
+      --accent: #7b7fff;
+    }
+    
+    [data-theme="light"] {
+      --color-surface-0: #ffffff;
+      --color-surface-1: #f8f9fa;
+      --color-surface-2: #e9ecef;
+      --color-surface-3: #dee2e6;
+    }
+    
+    body {
+      background: var(--color-surface-0);
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    [data-theme="light"] body {
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div id="health-root"></div>
+  <script type="module" src="/src/health/main.tsx"></script>
+</body>
+</html>

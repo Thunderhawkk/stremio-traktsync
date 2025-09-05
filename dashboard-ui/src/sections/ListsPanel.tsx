@@ -106,17 +106,40 @@ function GenresPortal({
       const r = base.getBoundingClientRect(); // viewport coordinates of the Lists card border box
       setRect({ top: Math.round(r.top), right: Math.round(r.right), height: Math.round(r.height) });
     };
+    
+    // Add a small delay to ensure DOM is fully rendered
+    const measureWithDelay = () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(measure);
+      });
+    };
+    
     const ro = new ResizeObserver(measure);
     const base = resolveOuterBordered(anchorRef.current);
     if (base) ro.observe(base);
-    measure();
+    
+    // Initial measurement with delay
+    measureWithDelay();
+    
     window.addEventListener("resize", measure);
     window.addEventListener("scroll", measure, { passive: true });
+    
+    // Also measure when tab visibility changes or window gains focus
+    const handleVisibilityChange = () => {
+      if (!document.hidden) measureWithDelay();
+    };
+    const handleFocus = () => measureWithDelay();
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    
     return () => {
       if (base) ro.unobserve(base);
       ro.disconnect();
       window.removeEventListener("resize", measure);
       window.removeEventListener("scroll", measure);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
     };
   }, [anchorRef]);
 

@@ -75,49 +75,61 @@ passport.use(new JwtStrategy(
 
 // Google OAuth2 Strategy
 if (cfg.oauth.google.clientId && cfg.oauth.google.clientSecret) {
-  passport.use(new GoogleStrategy(
-    {
-      clientID: cfg.oauth.google.clientId,
-      clientSecret: cfg.oauth.google.clientSecret,
-      callbackURL: cfg.oauth.google.callbackURL || '/auth/google/callback'
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        // Check if user exists with this Google ID
-        let user = await repo.findUserByProvider('google', profile.id);
-        
-        if (!user) {
-          // Check if user exists with same email
-          const emailUser = await repo.findUserByEmail(profile.emails[0].value);
-          if (emailUser) {
-            // Link existing account
-            user = await repo.updateUser(emailUser.id, {
-              provider: 'google',
-              provider_id: profile.id,
-              avatar_url: profile.photos[0]?.value,
-              email_verified: profile.emails[0]?.verified || true
-            });
-          } else {
-            // Create new user
-            user = await repo.createUser({
-              username: profile.username || profile.displayName || profile.emails[0].value.split('@')[0],
-              email: profile.emails[0].value,
-              provider: 'google',
-              provider_id: profile.id,
-              avatar_url: profile.photos[0]?.value,
-              email_verified: profile.emails[0]?.verified || true,
-              role: 'user'
-            });
+  console.log('Google OAuth2 Configuration:');
+  console.log('- Client ID:', cfg.oauth.google.clientId.substring(0, 10) + '...');
+  console.log('- Client Secret:', cfg.oauth.google.clientSecret ? 'Set' : 'Not Set');
+  console.log('- Callback URL:', cfg.oauth.google.callbackURL);
+  
+  try {
+    passport.use(new GoogleStrategy(
+      {
+        clientID: cfg.oauth.google.clientId,
+        clientSecret: cfg.oauth.google.clientSecret,
+        callbackURL: cfg.oauth.google.callbackURL || '/auth/google/callback'
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          // Check if user exists with this Google ID
+          let user = await repo.findUserByProvider('google', profile.id);
+          
+          if (!user) {
+            // Check if user exists with same email
+            const emailUser = await repo.findUserByEmail(profile.emails[0].value);
+            if (emailUser) {
+              // Link existing account
+              user = await repo.updateUser(emailUser.id, {
+                provider: 'google',
+                provider_id: profile.id,
+                avatar_url: profile.photos[0]?.value,
+                email_verified: profile.emails[0]?.verified || true
+              });
+            } else {
+              // Create new user
+              user = await repo.createUser({
+                username: profile.username || profile.displayName || profile.emails[0].value.split('@')[0],
+                email: profile.emails[0].value,
+                provider: 'google',
+                provider_id: profile.id,
+                avatar_url: profile.photos[0]?.value,
+                email_verified: profile.emails[0]?.verified || true,
+                role: 'user'
+              });
+            }
           }
-        }
 
-        await repo.updateUserLoginAt(user.id).catch(() => {});
-        return done(null, user);
-      } catch (err) {
-        return done(err, null);
+          await repo.updateUserLoginAt(user.id).catch(() => {});
+          return done(null, user);
+        } catch (err) {
+          console.error('Google OAuth error:', err);
+          return done(err, null);
+        }
       }
-    }
-  ));
+    ));
+  } catch (error) {
+    console.error('Failed to configure Google OAuth strategy:', error);
+  }
+} else {
+  console.warn('Google OAuth not configured - missing client ID or secret');
 }
 
 // GitHub OAuth2 Strategy

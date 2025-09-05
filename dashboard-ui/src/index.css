@@ -37,42 +37,54 @@
   --elevation-4: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 }
 
-/* Light theme with enhanced color palette */
+/* Light theme with enhanced color palette and improved contrast */
 :root[data-theme="light"] { 
   color-scheme: light;
   
-  /* Base colors */
+  /* Base colors with better contrast */
   --color-bg: #ffffff;
-  --color-fg: #1f2937;
-  --color-muted: #6b7280;
+  --color-fg: #111827; /* Darker text for better readability */
+  --color-muted: #4b5563; /* Darker muted text for better visibility */
   --color-surface-0: #ffffff;
-  --color-surface-1: #f9fafb;
-  --color-surface-2: #f3f4f6;
-  --color-surface-3: #e5e7eb;
-  --color-primary: #3b82f6;
+  --color-surface-1: #f8fafc; /* Slightly more contrast */
+  --color-surface-2: #f1f5f9; /* Better differentiation */
+  --color-surface-3: #e2e8f0; /* More visible borders */
+  --color-primary: #2563eb; /* Slightly darker primary for better contrast */
+  
+  /* Enhanced text colors for better visibility */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  --color-text-disabled: #94a3b8;
+  
+  /* Enhanced border colors */
+  --color-border-light: #e2e8f0;
+  --color-border-medium: #cbd5e1;
+  --color-border-strong: #94a3b8;
   
   /* Enhanced gradients for light theme */
-  --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  --gradient-secondary: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-  --gradient-surface: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-  --gradient-text: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --gradient-primary: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  --gradient-secondary: linear-gradient(135deg, #7c3aed 0%, #dc2626 100%);
+  --gradient-surface: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  --gradient-text: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
   
-  /* Glass morphism for light theme */
-  --glass-border: rgba(0, 0, 0, 0.1);
-  --glass-bg: rgba(255, 255, 255, 0.8);
+  /* Glass morphism for light theme with better visibility */
+  --glass-border: rgba(0, 0, 0, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.9);
   
   /* Interactive elements for light theme */
-  --border-interactive: rgba(59, 130, 246, 0.2);
-  --border-interactive-hover: rgba(59, 130, 246, 0.4);
-  --accent-glow: 0 0 20px rgba(59, 130, 246, 0.2);
+  --border-interactive: rgba(37, 99, 235, 0.3);
+  --border-interactive-hover: rgba(37, 99, 235, 0.5);
+  --accent-glow: 0 0 20px rgba(37, 99, 235, 0.25);
   
-  /* Shadows for light theme */
-  --shadow-1: 0 8px 22px rgba(0,0,0,.08);
-  --shadow-2: 0 14px 36px rgba(0,0,0,.12);
-  --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
-  --elevation-2: 0 3px 6px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.12);
-  --elevation-3: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.12);
-  --elevation-4: 0 14px 28px rgba(0, 0, 0, 0.12), 0 10px 10px rgba(0, 0, 0, 0.11);
+  /* Enhanced shadows for light theme */
+  --shadow-1: 0 8px 22px rgba(0,0,0,.12);
+  --shadow-2: 0 14px 36px rgba(0,0,0,.16);
+  --shadow-3: 0 20px 50px rgba(0,0,0,.20);
+  --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.15);
+  --elevation-2: 0 3px 6px rgba(0, 0, 0, 0.12), 0 3px 6px rgba(0, 0, 0, 0.18);
+  --elevation-3: 0 10px 20px rgba(0, 0, 0, 0.15), 0 6px 6px rgba(0, 0, 0, 0.18);
+  --elevation-4: 0 14px 28px rgba(0, 0, 0, 0.18), 0 10px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* Auto theme detection */
@@ -353,4 +365,128 @@ body {
     border-color var(--animation-duration) ease,
     color var(--animation-duration) ease,
     box-shadow var(--animation-duration) ease;
+}
+
+/* Light theme specific UI improvements */
+:root[data-theme="light"] {
+  /* Ensure text contrast in light theme */
+  .text-muted { color: var(--color-text-muted) !important; }
+  .text-secondary { color: var(--color-text-secondary) !important; }
+  
+  /* Better button visibility */
+  button, .btn {
+    border: 1px solid var(--color-border-medium);
+  }
+  
+  /* Improve card visibility */
+  .card, [data-card] {
+    background: var(--color-surface-1);
+    border: 1px solid var(--color-border-light);
+    box-shadow: var(--elevation-1);
+  }
+  
+  /* Better input field visibility */
+  input, textarea, select {
+    background: var(--color-surface-0);
+    border: 1px solid var(--color-border-medium);
+    color: var(--color-text-primary);
+  }
+  
+  input::placeholder, textarea::placeholder {
+    color: var(--color-text-muted);
+  }
+  
+  /* Improve dropdown and select visibility */
+  select option {
+    background: var(--color-surface-0);
+    color: var(--color-text-primary);
+  }
+  
+  /* Better tab visibility */
+  [role="tab"] {
+    border: 1px solid var(--color-border-light);
+  }
+  
+  [role="tab"][data-state="active"] {
+    background: var(--color-surface-0);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  
+  /* Improve badge contrast */
+  .badge {
+    background: var(--color-surface-2);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-medium);
+  }
+  
+  /* Better modal and dialog visibility */
+  [data-overlay] {
+    background: rgba(0, 0, 0, 0.6);
+  }
+  
+  [data-dialog] {
+    background: var(--color-surface-0);
+    border: 1px solid var(--color-border-medium);
+    box-shadow: var(--elevation-4);
+  }
+  
+  /* Improve navigation visibility */
+  nav, .navigation {
+    background: var(--color-surface-1);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  
+  /* Better link visibility */
+  a {
+    color: var(--color-primary);
+  }
+  
+  a:hover {
+    color: var(--color-text-primary);
+  }
+  
+  /* Improve table visibility */
+  table {
+    border: 1px solid var(--color-border-light);
+  }
+  
+  th, td {
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  
+  /* Better scrollbar for light theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--color-surface-2);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+  }
+}
+
+/* Additional contrast improvements for common UI patterns */
+:root[data-theme="light"] .glass {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--color-border-medium);
+}
+
+:root[data-theme="light"] .surface-interactive {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-medium);
+}
+
+:root[data-theme="light"] .surface-interactive:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-primary);
 }

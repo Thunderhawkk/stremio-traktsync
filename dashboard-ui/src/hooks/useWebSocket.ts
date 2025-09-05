@@ -75,9 +75,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     wsClient.requestSync();
   }, []);
 
-  const updateList = useCallback((listId: string, changes: any) => {
-    wsClient.updateList(listId, changes);
-  }, []);
+  // List update method removed
 
   const refreshTrakt = useCallback(() => {
     wsClient.refreshTrakt();
@@ -90,7 +88,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   return {
     status,
     requestSync,
-    updateList,
     refreshTrakt,
     ping
   };
@@ -187,23 +184,4 @@ export function useTraktSync() {
   };
 }
 
-export function useListUpdates() {
-  const [updates, setUpdates] = useState<Array<{ listId: string; changes: any; timestamp: string }>>([]);
-
-  useWebSocketEvent('list:updated', (data: { listId: string; changes: any; timestamp: string }) => {
-    setUpdates(prev => [data, ...prev.slice(0, 9)]); // Keep last 10 updates
-  });
-
-  useWebSocketEvent('list:error', (data: { error: string }) => {
-    console.error('List update error:', data.error);
-  });
-
-  const clearUpdates = useCallback(() => {
-    setUpdates([]);
-  }, []);
-
-  return {
-    updates,
-    clearUpdates
-  };
-}
+// List update hooks removed
