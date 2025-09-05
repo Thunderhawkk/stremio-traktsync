@@ -2,7 +2,7 @@
   "addonName": "TraktSync",
   "catalogPrefix": "TraktSync",
   "manifestVersion": 1,
-  "lastAutoRefreshAt": "2025-09-02T23:08:41.267Z",
+  "lastAutoRefreshAt": "2025-09-04T23:58:53.266Z",
   "lastManualRefreshAt": null,
   "lists": [
     {
@@ -21,8 +21,8 @@
       "order": 0,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-04T02:07:26.518Z",
-      "updatedAt": "2025-09-04T02:07:26.518Z"
+      "createdAt": "2025-09-05T01:10:33.310Z",
+      "updatedAt": "2025-09-05T01:10:33.310Z"
     },
     {
       "id": "bebdd2b2-f7f0-4603-a1e1-83db8f8c0b65",
@@ -31,7 +31,7 @@
       "type": "movie",
       "sortBy": "year",
       "sortOrder": "",
-      "genre": "Comedy + Horror",
+      "genre": "Comedy + Fantasy + Horror",
       "yearMin": "",
       "yearMax": "",
       "ratingMin": "",
@@ -40,8 +40,8 @@
       "order": 1,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-04T02:07:26.518Z",
-      "updatedAt": "2025-09-04T02:07:26.518Z"
+      "createdAt": "2025-09-05T01:10:33.310Z",
+      "updatedAt": "2025-09-05T01:10:33.310Z"
     },
     {
       "id": "c62c64a2-1ead-4c5b-9886-5ec9a0a597ed",
@@ -59,15 +59,15 @@
       "order": 2,
       "hideUnreleased": false,
       "userId": "04273438-2d6f-43c0-87c6-1848800f544b",
-      "createdAt": "2025-09-04T02:07:26.518Z",
-      "updatedAt": "2025-09-04T02:07:26.518Z"
+      "createdAt": "2025-09-05T01:10:33.310Z",
+      "updatedAt": "2025-09-05T01:10:33.310Z"
     }
   ],
   "addonToken": "95de27d20f3805195e81e0b9daa349a2",
   "traktTokens": {
-    "access_token": "d5398bd1bae7e37313502aaaf6cdc0f69f058117005802a4e12d5cecda4c82fa",
-    "refresh_token": "c8b96e515d8fc815f0b02cbffd107211ca62df5de022ffdc02f30930472dcacb",
-    "expires_at": "2025-09-04T23:07:24.590Z"
+    "access_token": "21a1b7c50572fa19afa7462ec9a92bf90720bdcab0092212418cd99041e1a18c",
+    "refresh_token": "8ed8bd8f63d39c56f7e1938433de1c02d71cdc2f25af4ca1e607c9ce283b95ca",
+    "expires_at": "2025-09-05T23:59:44.000Z"
   },
   "hideUnreleasedAll": true
 }

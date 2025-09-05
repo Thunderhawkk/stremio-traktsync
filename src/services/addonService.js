@@ -2,16 +2,13 @@
 const { repo } = require('../db/repo');
 const { getUserListItems } = require('../services/traktService'); // should request extended=full so items include genres/released where available [Trakt API]
 const { cache, k } = require('../utils/cache');
-
 // Optional settings reader (graceful fallback)
 let getUserSettings = null;
 try { ({ getUserSettings } = require('../state/userSettings')); }
 catch { getUserSettings = async () => ({ addonName: 'Trakt Lists', catalogPrefix: '', hideUnreleasedAll: false }); }
-
 // Optional delta scheduler (safe no‑op if module missing)
 let ensureDeltaScheduleForUser = () => {};
 try { ({ ensureDeltaScheduleForUser } = require('../services/deltaRefresh')); } catch { ensureDeltaScheduleForUser = () => {}; }
-
 // Canonical genres (safe fallback if constants file missing)
 let GENRES = [
   'Action','Adventure','Animation','Comedy','Crime','Documentary','Drama',
@@ -19,9 +16,7 @@ let GENRES = [
   'Science Fiction','Thriller','War','Western'
 ];
 try { ({ GENRES } = require('../constants/genres')); } catch {}
-
 const PAGE_SIZE = 100;
-
 function round1(val){ return (typeof val === 'number' && isFinite(val)) ? Math.round(val * 10)/10 : undefined; }
 
 // Normalized genre canonicalization (maps variants to a stable form)
@@ -82,6 +77,7 @@ function canon(s){
   if (/(^| )sci( fi)?( |$)/.test(n) || /science fiction/.test(n)) return 'science fiction';
   return n;
 }
+
 function genreMatch(metaGenres, target){
   if (!Array.isArray(metaGenres) || !metaGenres.length || !target) return false;
   const tgt = canon(target);
@@ -98,55 +94,70 @@ function genreMatch(metaGenres, target){
   return false;
 }
 
+// ---------- NEW: unlimited AND/OR parser used by applyFilters ----------
+function genreSlug(s) {
+  const t = mapGenre(String(s || '')) || '';
+  return t.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
+}
+function parseGenreGroups(input) {
+  if (!input) return [];
+  const cleaned = String(input).replace(/[()]/g, '');
+  return cleaned
+    .split(/\s*\+\s*/g)               // AND groups
+    .map(seg =>
+      seg
+        .split(/\s*,\s*/g)            // OR terms within a group
+        .map(genreSlug)
+        .filter(Boolean)
+    )
+    .filter(group => group.length > 0);
+}
+function makeAndOrPredicate(andGroups) {
+  if (!andGroups.length) return () => true;
+  return (itemGenres = []) => {
+    const set = new Set((Array.isArray(itemGenres) ? itemGenres : []).map(genreSlug));
+    return andGroups.every(orGroup => orGroup.some(g => set.has(g)));
+  };
+}
+// ----------------------------------------------------------------------
+
 function applyFilters(metas, extras = {}){
   let out = metas.slice();
-
   const raw = String(extras.genre || '').trim();
   const yMin = Number(extras.yearMin) || undefined;
   const yMax = Number(extras.yearMax) || undefined;
   const rMin = Number(extras.ratingMin) || undefined;
   const rMax = Number(extras.ratingMax) || undefined;
 
-  // Parse multi-genre syntax:
-  // - "A,B,C" => OR (any of the listed)
-  // - "A+B+C" => AND (must match all listed)
-  // If neither comma nor plus is present, treat as single genre.
-  const hasComma = raw.includes(',');
-  const hasPlus = raw.includes('+');
-
-  // Normalize tokens through mapGenre/canon-like path
-  const toCanon = (s) => (mapGenre(s) || '').toLowerCase().replace(/[_\-]+/g,' ').replace(/\s+/g,' ').trim();
-  const tokensOR = hasComma ? raw.split(',').map(t => toCanon(t)) : [];
-  const tokensAND = hasPlus ? raw.split('+').map(t => toCanon(t)) : [];
-  const single = (!hasComma && !hasPlus && raw) ? [toCanon(raw)] : [];
-
   // Only apply genre filter if metas expose genres; never nuke the list solely due to metadata gaps
   const anyGenresExposed = out.some(m => Array.isArray(m.genres) && m.genres.length);
-  if (anyGenresExposed) {
-    const matchCanon = (arr, c) => {
-      if (!Array.isArray(arr) || !arr.length || !c) return false;
-      // reuse tolerant matching from genreMatch by calling mapGenre on each and comparing canon
-      const canonArr = Array.from(new Set(arr.map(x => (mapGenre(x)||'').toLowerCase().replace(/[_\-]+/g,' ').replace(/\s+/g,' ').trim()).filter(Boolean)));
-      // exact or contains for composite labels like "sci-fi & fantasy"
-      return canonArr.some(g => g === c || g.includes(c));
-    };
 
-    let next = out;
-    if (tokensOR.length) {
-      next = next.filter(m => tokensOR.some(c => matchCanon(m.genres, c)));
-    } else if (tokensAND.length) {
-      next = next.filter(m => tokensAND.every(c => matchCanon(m.genres, c)));
-    } else if (single.length) {
-      next = next.filter(m => matchCanon(m.genres, single));
+  if (anyGenresExposed && raw) {
+    // NEW: unified unlimited AND/OR parsing (supports "A + B + C" and "A + (B,C)")
+    const groups = parseGenreGroups(raw);
+    if (groups.length) {
+      const mustMatch = makeAndOrPredicate(groups);
+      const before = out.length;
+      out = out.filter(m => mustMatch(m.genres || []));
+      // If everything was filtered out and we used AND, keep empty (true intersection), do not fall back to OR
+    } else {
+      // Fallback single-genre (bug fix: pass string, not array)
+      const single = genreSlug(raw);
+      if (single) {
+        const matchCanon = (arr, c) => {
+          if (!Array.isArray(arr) || !arr.length || !c) return false;
+          const canonArr = Array.from(new Set(arr.map(x => genreSlug(x)).filter(Boolean)));
+          return canonArr.some(g => g === c || g.includes(c));
+        };
+        out = out.filter(m => matchCanon(m.genres, single));
+      }
     }
-    if (next.length) out = next; // safe fallback if no matches
   }
 
   if (yMin) out = out.filter(m => Number(m.releaseInfo) ? Number(m.releaseInfo) >= yMin : true);
   if (yMax) out = out.filter(m => Number(m.releaseInfo) ? Number(m.releaseInfo) <= yMax : true);
   if (rMin) out = out.filter(m => typeof m.imdbRating === 'number' ? m.imdbRating >= rMin : true);
   if (rMax) out = out.filter(m => typeof m.imdbRating === 'number' ? m.imdbRating <= rMax : true);
-
   return out;
 }
 
@@ -170,10 +181,8 @@ function toTypeLabel(input){
 
 async function buildUserManifest({ userId, baseManifest }){
   const lists = await repo.getLists(userId);
-
   // Background delta refresh (no‑op if scheduler missing)
-  ensureDeltaScheduleForUser(userId); // polls Trakt “updated since” and purges caches on change [1]
-
+  ensureDeltaScheduleForUser(userId); // polls Trakt “updated since” and purges caches on change
   // Settings → manifest naming
   const s = await getUserSettings(repo, userId).catch(() => ({ addonName: 'Trakt Lists', catalogPrefix: '' }));
   const addonName = s?.addonName || baseManifest.name || 'Trakt Lists';
@@ -191,7 +200,7 @@ async function buildUserManifest({ userId, baseManifest }){
         { name: 'skip', isRequired: false },
         { name: 'sort', isRequired: false, options: ['rating','year','runtime','name'] },
         { name: 'order', isRequired: false, options: ['asc','desc'] },
-        { name: 'genre', isRequired: false, options: GENRES }, // Stremio genre extra [6]
+        { name: 'genre', isRequired: false, options: GENRES }, // Stremio genre extra
         { name: 'yearMin', isRequired: false },
         { name: 'yearMax', isRequired: false },
         { name: 'ratingMin', isRequired: false },
@@ -201,8 +210,6 @@ async function buildUserManifest({ userId, baseManifest }){
     }));
 
   const types = [customType];
-
-  // Keep meta resource for Cinemeta/meta lookups
   const resources = Array.isArray(baseManifest.resources) && baseManifest.resources.length
     ? baseManifest.resources
     : ['catalog', { name: 'meta', types: ['movie','series'], idPrefixes: ['tt'] }];
@@ -223,6 +230,7 @@ async function buildUserManifest({ userId, baseManifest }){
 }
 
 async function fetchTraktSlice({ userId, urlOrSlug, stremioType, skip }){
+  // Pull enough pages to serve PAGE_SIZE starting at skip
   const pageStart = Math.floor(skip / 100) + 1;
   const offset = skip % 100;
   let out = [];
@@ -288,6 +296,7 @@ async function getCatalog({ userId, type, catalogId, skip = 0, extras = {} }){
     const LIMIT = 100;
 
     if (hasNarrowing){
+      // Filter-aware pagination: gather across pages, apply filters on each chunk, and accumulate
       let filteredPool = [];
       for (let page=1; page<=MAX_PAGES; page++){
         const raw = await getUserListItems({ userId, urlOrSlug: l.url, stremioType: l.type, limit: LIMIT, page }).catch(() => []);
@@ -387,6 +396,7 @@ async function getCatalog({ userId, type, catalogId, skip = 0, extras = {} }){
 
       let out = applyFilters(metas, effExtras);
       if (effExtras.sort) out = applySort(out, effExtras.sort, effExtras.order);
+
       const result = { metas: out };
       cache.set(cacheKey, { ...result, _cachedAt: new Date().toISOString() });
       return { ...result, _cached: false, _cachedAt: new Date().toISOString() };

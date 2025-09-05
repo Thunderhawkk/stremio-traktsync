@@ -163,7 +163,7 @@ router.post('/validate-all', async (req, res) => {
   }
 });
 
-// Preview (unchanged core)
+// Preview schema
 const previewSchema = z.object({
   body: z.object({
     url: urlOrSlug,
@@ -203,27 +203,61 @@ function mapGenre(input) {
   if (l.includes('thriller')) return 'Thriller';
   if (l.includes('war')) return 'War';
   if (l.includes('western')) return 'Western';
-  return s.split(' ').map(w => w
-    ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
-    : w
-  ).join(' ');
+  return s.split(' ').map(w => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w).join(' ');
 }
+
+/* -------- Multi-genre AND/OR helpers (unlimited) -------- */
+function genreSlug(s) {
+  const t = mapGenre(String(s || '')) || '';
+  return t.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
+}
+function parseGenreFilterText(input) {
+  if (!input) return [];
+  const cleaned = String(input).replace(/[()]/g, '');
+  return cleaned
+    .split(/\s*\+\s*/g)            // AND groups
+    .map(seg => seg.split(/\s*,\s*/g).map(genreSlug).filter(Boolean))
+    .filter(group => group.length > 0);
+}
+function makeGenrePredicate(andGroups) {
+  if (!andGroups.length) return () => true;
+  return (itemGenres = []) => {
+    const set = new Set((Array.isArray(itemGenres) ? itemGenres : []).map(genreSlug));
+    return andGroups.every(orGroup => orGroup.some(g => set.has(g)));
+  };
+}
+/* ------------------------------------------------------- */
 
 function applyPreviewFilters(items, extras = {}) {
   let out = items.slice();
-  const genre = String(extras.genre || '').trim();
+  const genreText = String(extras.genre || '').trim();
   const yMin = Number(extras.yearMin) || undefined;
   const yMax = Number(extras.yearMax) || undefined;
   const rMin = Number(extras.ratingMin) || undefined;
   const rMax = Number(extras.ratingMax) || undefined;
-  if (genre) {
-    const g = mapGenre(genre);
-    out = out.filter(it => {
-      const core = it[it.type];
-      const arr = Array.isArray(core?.genres) ? core.genres : [];
-      return arr.some(x => mapGenre(x) === g);
-    });
+
+  if (genreText) {
+    const andGroups = parseGenreFilterText(genreText);
+    if (andGroups.length) {
+      const mustMatch = makeGenrePredicate(andGroups);
+      out = out.filter(it => {
+        const core = it[it.type];
+        const arr = Array.isArray(core?.genres) ? core.genres : [];
+        return mustMatch(arr);
+      });
+    } else {
+      const single = genreSlug(genreText);
+      if (single) {
+        out = out.filter(it => {
+          const core = it[it.type];
+          const arr = Array.isArray(core?.genres) ? core.genres : [];
+          const set = new Set(arr.map(genreSlug));
+          return set.has(single);
+        });
+      }
+    }
   }
+
   if (yMin) out = out.filter(it => (Number(it[it.type]?.year)||0) >= yMin);
   if (yMax) out = out.filter(it => (Number(it[it.type]?.year)||0) <= yMax);
   if (rMin) out = out.filter(it => (typeof it[it.type]?.rating === 'number' ? it[it.type]?.rating : 0) >= rMin);
@@ -247,10 +281,25 @@ router.post('/preview-list', validate(previewSchema), async (req, res) => {
   try {
     const exists = await validateListExists(url);
     if (!exists.ok) return res.status(400).json({ error: 'invalid_list' });
-    let items = await getUserListItems({ userId: req.user.id, urlOrSlug: url, stremioType: type, limit: 50 });
-    items = applyPreviewFilters(items || [], extras || {});
-    if (extras?.sort) items = applyPreviewSort(items, extras.sort, extras.order);
-    const previews = (items || []).slice(0, 25).map(it => {
+
+    // Determine if AND is requested and increase candidate pool for intersections
+    const genreText = String(extras?.genre || '').trim();
+    const andGroups = parseGenreFilterText(genreText);
+    const firstLimit = andGroups.length ? 250 : 50;   // larger first pass for AND [Trakt is OR by default]
+    const secondLimit = 1000;                         // max retry if first pass yields 0
+
+    // First pass
+    let items = await getUserListItems({ userId: req.user.id, urlOrSlug: url, stremioType: type, limit: firstLimit });
+    let filtered = applyPreviewFilters(items || [], extras || {});
+    // Retry with bigger pool if AND was requested and nothing matched in first slice
+    if (andGroups.length && filtered.length === 0) {
+      const more = await getUserListItems({ userId: req.user.id, urlOrSlug: url, stremioType: type, limit: secondLimit });
+      filtered = applyPreviewFilters(more || [], extras || {});
+    }
+
+    if (extras?.sort) filtered = applyPreviewSort(filtered, extras.sort, extras.order);
+
+    const previews = (filtered || []).slice(0, 25).map(it => {
       const core = it[it.type];
       return { title: core?.title, year: core?.year, ids: core?.ids, rating: core?.rating, runtime: core?.runtime, genres: core?.genres };
     });
